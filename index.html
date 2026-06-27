@@ -24,9 +24,6 @@
             border-radius: 16px;
             overflow: hidden;
         }
-        canvas {
-            display: block;
-        }
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -48,6 +45,20 @@
             text-transform: uppercase;
         }
 
+        /* SETTING AUDIO BUTTON */
+        #settingAudioBtn {
+            position: absolute;
+            top: 25px; right: 40px;
+            width: 50px; height: 50px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(56, 189, 248, 0.5);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 20; pointer-events: auto;
+            backdrop-filter: blur(8px);
+        }
+        #settingAudioBtn svg { width: 24px; height: 24px; fill: #38bdf8; }
+
         #victoryPopup {
             background: rgba(5, 7, 15, 0.85);
             backdrop-filter: blur(8px);
@@ -59,18 +70,14 @@
             animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #victoryPopup h2 {
-            font-size: 36px;
-            font-weight: 900;
+            font-size: 36px; font-weight: 900;
             background: linear-gradient(to bottom, #ffe600, #b58600);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 10px;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-transform: uppercase; letter-spacing: 3px; margin-bottom: 10px;
         }
         @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* TOUCH OVERLAY WITH MASSIVE BUTTONS */
+        /* HUD CONTROLS */
         #controlsOverlay {
             position: absolute;
             bottom: 25px; left: 0; width: 100%;
@@ -82,35 +89,22 @@
             width: 85px; height: 85px; background: rgba(15, 23, 42, 0.75);
             border: 2px solid rgba(56, 189, 248, 0.6); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            backdrop-filter: blur(8px);
-            touch-action: none;
+            backdrop-filter: blur(8px); touch-action: none;
         }
         .ctrl-btn:active { background: rgba(56, 189, 248, 0.4); transform: scale(0.92); }
         .ctrl-btn svg { width: 45px; height: 45px; fill: #38bdf8; }
 
-        /* PORTRAIT WARNING ANIMATION */
         #rotateWarning {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #05070f; z-index: 100; display: none;
             flex-direction: column; justify-content: center; align-items: center;
         }
         .phone-icon {
-            width: 70px; height: 120px;
-            border: 4px solid #38bdf8; border-radius: 10px;
-            position: relative; margin-bottom: 35px;
-            animation: rotatePhone 2.2s infinite ease-in-out;
+            width: 70px; height: 120px; border: 4px solid #38bdf8; border-radius: 10px;
+            position: relative; margin-bottom: 35px; animation: rotatePhone 2.2s infinite ease-in-out;
         }
-        .phone-icon::after {
-            content: ''; position: absolute; bottom: 8px; left: 50%;
-            transform: translateX(-50%); width: 10px; height: 10px;
-            background: #38bdf8; border-radius: 50%;
-        }
-        @keyframes rotatePhone {
-            0% { transform: rotate(0deg); }
-            40% { transform: rotate(-90deg); }
-            60% { transform: rotate(-90deg); }
-            100% { transform: rotate(0deg); }
-        }
+        .phone-icon::after { content: ''; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: #38bdf8; border-radius: 50%; }
+        @keyframes rotatePhone { 0% { transform: rotate(0deg); } 40% { transform: rotate(-90deg); } 60% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
         @media (orientation: portrait) { #rotateWarning { display: flex; } }
     </style>
 </head>
@@ -122,6 +116,12 @@
     </div>
 
     <div id="gameContainer">
+        <div id="settingAudioBtn" class="hide" onclick="toggleAudio()">
+            <svg id="audioIcon" viewBox="0 0 24 24">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+            </svg>
+        </div>
+
         <div id="startScreen" class="screen">
             <div class="studio-title">Stardust Studio Presents</div>
             <h1 class="game-title">Cosmic Deception</h1>
@@ -164,12 +164,12 @@ let deaths = 0;
 let isTransitioning = false;
 let portalRotation = 0;
 
-// Player (Cyber Capsule Core)
+// Player Core
 let player = { x: 60, y: 300, width: 24, height: 34, speed: 5.2, velX: 0, velY: 0, jumping: false, grounded: false };
 const gravity = 0.52;
 const friction = 0.82;
 
-// Animated Background Stars
+// Cosmic Particles Environment data
 let stars = [];
 let shootingStars = [];
 for(let i=0; i<45; i++) {
@@ -180,53 +180,64 @@ let platforms = [];
 let traps = [];
 let portal = { x: 760, y: 310, width: 50, height: 90 };
 
-// SOFT SPACE SYNTHESIZER MUSIC ENGINE (Full Volume, Gentle Sound)
+// SOFT AUDIO MELODY SYNTH ENGINE
 let audioCtx = null;
-function startCosmicAmbientMusic() {
+let masterGain = null;
+let isMuted = false;
+let melodyTimer = null;
+
+function startSoftMelody() {
     if (audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Smooth cinematic chord progression
-    let pads = [146.83, 164.81, 196.00, 220.00]; // D3, E3, G3, A3 (Beautiful open scale)
-    let chordIndex = 0;
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0.9, audioCtx.currentTime); // Louder clear setting
+    masterGain.connect(audioCtx.destination);
 
-    setInterval(() => {
-        if (gameState !== "PLAYING" || isTransitioning) return;
+    // Sweet cosmic crystalline melody matrix notes
+    let melody = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]; // C4, D4, E4, G4, A4, C5 (Crystal Pentatonic Scale)
+    let index = 0;
+
+    melodyTimer = setInterval(() => {
+        if (gameState !== "PLAYING" || isTransitioning || isMuted) return;
+
+        let osc = audioCtx.createOscillator();
+        let filter = audioCtx.createBiquadFilter();
+        let noteGain = audioCtx.createGain();
+
+        // Triangle wave creates a beautiful sweet retro crystal music box sound
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(melody[index], audioCtx.currentTime);
         
-        let osc1 = audioCtx.createOscillator();
-        let osc2 = audioCtx.createOscillator();
-        let gainNode = audioCtx.createGain();
-        let lowpass = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, audioCtx.currentTime); // Clear soft cut-off
 
-        // Sine wave for ultra-soft texture, no harsh tones
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(pads[chordIndex], audioCtx.currentTime);
-        
-        // Harmonizer (Perfect fifth up for space expansion feel)
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(pads[chordIndex] * 1.5, audioCtx.currentTime);
+        noteGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        noteGain.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + 0.05);
+        noteGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
 
-        lowpass.type = 'lowpass';
-        lowpass.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.connect(filter);
+        filter.connect(noteGain);
+        noteGain.connect(masterGain);
 
-        // Max comfortable full volume settings
-        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.8, audioCtx.currentTime + 0.5); 
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 3.4);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.6);
 
-        osc1.connect(lowpass);
-        osc2.connect(lowpass);
-        lowpass.connect(gainNode);
-        gainNode.connect(audioCtx.destination);
-        
-        osc1.start();
-        osc2.start();
-        
-        osc1.stop(audioCtx.currentTime + 3.5);
-        osc2.stop(audioCtx.currentTime + 3.5);
+        // Pattern sequencing progression logic
+        index = (index + Math.floor(Math.random() * 3) + 1) % melody.length;
+    }, 280); // Quick crystalline fluid notes
+}
 
-        chordIndex = (chordIndex + 1) % pads.length;
-    }, 3500);
+function toggleAudio() {
+    if(!masterGain) return;
+    isMuted = !isMuted;
+    const icon = document.getElementById("audioIcon");
+    if(isMuted) {
+        masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        icon.innerHTML = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
+    } else {
+        masterGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+        icon.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
+    }
 }
 
 function loadLevel(lvl) {
@@ -238,15 +249,15 @@ function loadLevel(lvl) {
 
     if (lvl === 1) {
         platforms.push({ x: 200, y: 400, width: 480, height: 80, type: 'solid' });
-        // SPEED COMPROMISED FOR VISIBILITY: Target Y accurate calculation, speed changed to 6.5 from 12.
-        traps.push({ x: 440, y: 404, width: 26, height: 32, targetY: 368, type: 'rising', triggerX: 420, triggered: false });
+        // ANIMATION VALUES ADDED: currentY added for fluid vector slide rendering
+        traps.push({ x: 440, y: 400, currentY: 400, width: 26, height: 35, targetY: 366, type: 'rising', triggerX: 420, triggered: false });
     } else if (lvl === 2) {
         platforms.push({ x: 200, y: 400, width: 220, height: 80, type: 'solid' });
         platforms.push({ x: 420, y: 400, width: 100, height: 80, type: 'fake', triggered: false, velY: 0 });
         platforms.push({ x: 520, y: 400, width: 160, height: 80, type: 'solid' });
     } else if (lvl === 3) {
         platforms.push({ x: 200, y: 400, width: 480, height: 80, type: 'solid' });
-        traps.push({ x: 500, y: -60, width: 55, height: 55, triggerX: 490, type: 'falling', triggered: false, velY: 0 });
+        traps.push({ x: 500, y: -60, currentY: -60, width: 55, height: 55, triggerX: 490, type: 'falling', triggered: false });
     } else {
         currentLevel = 1;
         loadLevel(1);
@@ -268,15 +279,16 @@ function bindControls() {
 function startGame() {
     document.getElementById("startScreen").classList.add("hide");
     document.getElementById("controlsOverlay").classList.remove("hide");
+    document.getElementById("settingAudioBtn").classList.remove("hide");
     gameState = "PLAYING";
-    try { startCosmicAmbientMusic(); } catch(e){}
+    try { startSoftMelody(); } catch(e){}
     loadLevel(currentLevel);
 }
 
 function update() {
     if (gameState !== "PLAYING" || isTransitioning) return;
 
-    portalRotation += 0.03; // Rotate Vector Portal Loops
+    portalRotation += 0.03;
 
     if(Math.random() < 0.015) {
         shootingStars.push({ x: Math.random()*600, y: 0, vx: 4, vy: 3, len: 25, alpha: 1 });
@@ -307,17 +319,21 @@ function update() {
     for (let trap of traps) {
         if (player.x >= trap.triggerX) trap.triggered = true;
         
-        // SPEED IS MODERATED HERE (From 12 to 6.5 for visible processing)
-        if (trap.type === 'rising' && trap.triggered && trap.y > trap.targetY) trap.y -= 6.5; 
-        if (trap.type === 'falling' && trap.triggered) { trap.velY += 1.1; trap.y += trap.velY; }
+        // FLUID SMOOTH EASING SLIDE ANIMATION VALUES INTERPOLATION
+        if (trap.type === 'rising' && trap.triggered) {
+            if(trap.currentY > trap.targetY) trap.currentY -= 3.5; // Visible steady float slide up
+        }
+        if (trap.type === 'falling' && trap.triggered) {
+            trap.currentY += 7.5; // Smooth gravity descent block
+        }
 
+        // Active collision binds directly to animated currentY processing
         if (player.x < trap.x + trap.width && player.x + player.width > trap.x &&
-            player.y < trap.y + trap.height && player.y + player.height > trap.y) {
+            player.y < trap.currentY + trap.height && player.y + player.height > trap.currentY) {
             playerDie();
         }
     }
 
-    // Portal Detection Intersection check
     if (player.x < portal.x + portal.width && player.x + player.width > portal.x &&
         player.y < portal.y + portal.height && player.y + player.height > portal.y) {
         triggerVictoryScreen();
@@ -346,11 +362,9 @@ function playerDie() {
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "#0b0f19";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#0b0f19"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Sky Twinkle Engine
+    // Twinkle Background
     ctx.fillStyle = "#fff";
     for(let s of stars) {
         ctx.globalAlpha = Math.abs(Math.sin(Date.now()*0.001 + s.alpha*10));
@@ -371,39 +385,27 @@ function render() {
         ctx.fillStyle = "#4338ca"; ctx.fillRect(plat.x, plat.y, plat.width, 3);
     }
 
-    // Process Hidden Traps
+    // MATCHED COLOR TRAPS (Hidden inside environment themes perfectly)
     for (let trap of traps) {
-        ctx.fillStyle = trap.triggered ? "#ef4444" : "#131a26"; 
-        ctx.fillRect(trap.x, trap.y, trap.width, trap.height);
-        if(!trap.triggered) {
-            ctx.fillStyle = "#4338ca"; ctx.fillRect(trap.x, trap.y, trap.width, 3);
-        }
+        ctx.fillStyle = "#131a26"; // Exact platform matching theme color
+        ctx.fillRect(trap.x, trap.currentY, trap.width, trap.height);
+        
+        ctx.fillStyle = "#4338ca"; // Top runner edge alignment
+        ctx.fillRect(trap.x, trap.currentY, trap.width, 3);
     }
 
-    // DRAW ADVANCED DETAILED SVG-STYLE NEON SPACE PORTAL GATE
+    // ADVANCED DETAILED VECTOR NEON PORTAL GATE
     let pCenterX = portal.x + portal.width / 2;
     let pCenterY = portal.y + portal.height / 2;
-    
-    ctx.save();
-    ctx.translate(pCenterX, pCenterY);
-    ctx.rotate(portalRotation);
-    
-    // Outer Ring Structure
+    ctx.save(); ctx.translate(pCenterX, pCenterY); ctx.rotate(portalRotation);
     ctx.strokeStyle = "#06b6d4"; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.arc(0, 0, 32, 0, Math.PI * 2); ctx.stroke();
-    
-    // Middle Starburst Ring Segments
-    ctx.strokeStyle = "#a855f7"; ctx.lineWidth = 2;
-    ctx.setLineDash([6, 12]);
-    ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.stroke();
-    ctx.setLineDash([]);
-    
-    // Core Event Horizon Singularity Capsule
+    ctx.strokeStyle = "#a855f7"; ctx.lineWidth = 2; ctx.setLineDash([6, 12]);
+    ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
     ctx.fillStyle = "rgba(6, 182, 212, 0.4)";
-    ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
+    ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 
-    // Render Jetpack Capsule Character
+    // Render Jetpack Capsule Pilot
     ctx.fillStyle = "#38bdf8"; 
     ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 10); ctx.fill();
     ctx.fillStyle = "#0f172a"; ctx.fillRect(player.x + 4, player.y + 6, player.width - 8, 8);
