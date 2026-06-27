@@ -3,54 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>STARDUST TROLL GAME- Single Page</title>
+    <title>Stardust: Cosmic Deception</title>
     <style>
         body {
             margin: 0;
-            background-color: #1a1a1a;
+            background: radial-gradient(circle, #0f172a 0%, #020617 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #f8fafc;
             overflow: hidden;
         }
         h1 {
-            margin-bottom: 5px;
-            color: #ff4757;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin: 5px 0;
+            font-size: 28px;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #38bdf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
         }
         p {
-            margin-top: 0;
-            color: #ccc;
+            margin: 0 0 15px 0;
+            color: #94a3b8;
+            font-size: 14px;
         }
         canvas {
-            background-color: #57606f; /* Level Devil greyish/dark theme vibe */
-            border: 4px solid #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            border-radius: 4px;
+            background-color: #0b0f19;
+            border: 2px solid #38bdf8;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
+            border-radius: 8px;
         }
         .stats {
             margin-top: 15px;
-            font-size: 18px;
+            font-size: 16px;
+            letter-spacing: 1px;
+            background: rgba(30, 41, 59, 0.7);
+            padding: 6px 20px;
+            border-radius: 30px;
+            border: 1px solid #475569;
+            backdrop-filter: blur(4px);
+        }
+        span {
+            color: #f43f5e;
             font-weight: bold;
-            background: #2f3542;
-            padding: 8px 20px;
-            border-radius: 20px;
-            border: 1px solid #747d8c;
         }
     </style>
 </head>
 <body>
 
-    <h1>Level Devil - NOT A Troll Game 😉</h1>
-    <p>Controls: Arrow Keys / WASD | Goal: Reach the Orange Door</p>
+    <h1>Stardust: Cosmic Deception</h1>
+    <p>Use Arrow Keys or WASD | Find the Portal</p>
     
     <canvas id="gameCanvas" width="900" height="450"></canvas>
     
-    <div class="stats">Deaths: <span id="deathCount">0</span></div>
+    <div class="stats">DEATHS: <span id="deathCount">0</span></div>
 
 <script>
 const canvas = document.getElementById("gameCanvas");
@@ -59,12 +69,12 @@ const deathCountEl = document.getElementById("deathCount");
 
 let deaths = 0;
 
-// Player Setup
+// Player Setup (Cosmic Square)
 let player = {
     x: 50,
     y: 350,
-    width: 25,
-    height: 25,
+    width: 24,
+    height: 24,
     speed: 4.5,
     velX: 0,
     velY: 0,
@@ -75,53 +85,47 @@ let player = {
 const gravity = 0.5;
 const friction = 0.85;
 
-// Game Objects Arrays
 let platforms = [];
 let traps = [];
-let goal = { x: 830, y: 310, width: 30, height: 50 };
+let portal = { x: 830, y: 310, width: 30, height: 50 };
 
 function initLevel() {
-    // 1. Normal Solid Platforms
+    // Solid Cosmic Platforms
     platforms = [
-        { x: 0, y: 400, width: 300, height: 50, type: 'solid' },     // Start ground
-        { x: 380, y: 400, width: 150, height: 50, type: 'solid' },    // Middle ground
-        { x: 600, y: 330, width: 100, height: 120, type: 'solid' },   // High block
-        { x: 780, y: 360, width: 120, height: 90, type: 'solid' },    // Goal ground
+        { x: 0, y: 400, width: 300, height: 50, type: 'solid' },
+        { x: 380, y: 400, width: 150, height: 50, type: 'solid' },
+        { x: 600, y: 330, width: 100, height: 120, type: 'solid' },
+        { x: 780, y: 360, width: 120, height: 90, type: 'solid' },
     ];
 
-    // 2. Troll Platform (Fake Platform - Jo khade hote hi gir jayega)
+    // Fake Platform (Bhram)
     platforms.push({
         x: 270, y: 400, width: 110, height: 50, 
         type: 'fake', 
         triggered: false, 
-        velY: 0, 
-        color: '#2ed573' // Dikhne me normal green platform jaisa
+        velY: 0
     });
 
-    // 3. Traps Setup
+    // Invisible/Trigger Traps
     traps = [
-        // Rising Spike (Zameen ke andar chhupi hai)
         { 
-            x: 450, y: 400, width: 25, height: 25, 
-            targetY: 375, type: 'rising', 
-            triggered: false, color: '#ff4757' 
+            x: 450, y: 400, width: 24, height: 24, 
+            targetY: 376, type: 'rising', 
+            triggered: false
         },
-        // Falling Ceiling (Upar aasmaan me chhupa bada block)
         { 
             x: 610, y: -100, width: 80, height: 40, 
             triggerX: 550, type: 'falling', 
-            triggered: false, velY: 0, color: '#ff6b81' 
+            triggered: false, velY: 0
         }
     ];
 }
 
-// Controls
 let keys = {};
 document.body.addEventListener("keydown", (e) => keys[e.code] = true);
 document.body.addEventListener("keyup", (e) => keys[e.code] = false);
 
 function update() {
-    // Movement Logic
     if (keys["ArrowUp"] || keys["KeyW"] || keys["Space"]) {
         if (!player.jumping && player.grounded) {
             player.jumping = true;
@@ -140,14 +144,12 @@ function update() {
     player.velY += gravity;
     player.grounded = false;
 
-    // Platform Collisions & Fake Platform Logic
     for (let plat of platforms) {
         if (plat.type === 'fake' && plat.triggered) {
             plat.velY += 0.5;
             plat.y += plat.velY;
         }
 
-        // Collision Check
         if (player.x < plat.x + plat.width &&
             player.x + player.width > plat.x &&
             player.y + player.height <= plat.y + 10 &&
@@ -159,33 +161,28 @@ function update() {
             player.y = plat.y - player.height;
 
             if (plat.type === 'fake') {
-                plat.triggered = true; // Player ke pair rakhte hi platform trigger
+                plat.triggered = true;
             }
         }
     }
 
-    // Move Player
     player.x += player.velX;
     player.y += player.velY;
 
-    // Screen Boundaries & Pit Death
     if (player.x < 0) player.x = 0;
     if (player.x > canvas.width - player.width) player.x = canvas.width - player.width;
     if (player.y > canvas.height) {
         playerDie();
     }
 
-    // --- TROLL TRAPS ENGINE ---
     for (let trap of traps) {
-        // Trigger Rising Spike
         if (trap.type === 'rising' && Math.abs(player.x - trap.x) < 90) {
             trap.triggered = true;
         }
         if (trap.type === 'rising' && trap.triggered && trap.y > trap.targetY) {
-            trap.y -= 6; // Fast pop up
+            trap.y -= 6;
         }
 
-        // Trigger Falling Ceiling
         if (trap.type === 'falling' && player.x > trap.triggerX && player.y < 350) {
             trap.triggered = true;
         }
@@ -194,7 +191,6 @@ function update() {
             trap.y += trap.velY;
         }
 
-        // Trap Collision Check (Death)
         if (player.x < trap.x + trap.width &&
             player.x + player.width > trap.x &&
             player.y < trap.y + trap.height &&
@@ -203,12 +199,11 @@ function update() {
         }
     }
 
-    // Win Condition
-    if (player.x < goal.x + goal.width &&
-        player.x + player.width > goal.x &&
-        player.y < goal.y + goal.height &&
-        player.y + player.height > goal.y) {
-        alert("🎉 Level Cleared! Aap Level Devil se zyada hoshiyar nikle!");
+    if (player.x < portal.x + portal.width &&
+        player.x + player.width > portal.x &&
+        player.y < portal.y + portal.height &&
+        player.y + player.height > portal.y) {
+        alert("✨ Cosmic Paradox Cleared! Next Zone coming soon...");
         deaths = 0;
         deathCountEl.innerText = deaths;
         resetPlayer();
@@ -220,7 +215,7 @@ function playerDie() {
     deaths++;
     deathCountEl.innerText = deaths;
     resetPlayer();
-    initLevel(); // Level reset taaki traps wapas apni jagah aa jayein
+    initLevel();
 }
 
 function resetPlayer() {
@@ -233,24 +228,39 @@ function resetPlayer() {
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw Platforms
-    for (let plat of platforms) {
-        ctx.fillStyle = plat.type === 'fake' ? plat.color : "#2ed573"; // Platform Green
-        ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+    // Grid effect for space vibe
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.03)";
+    ctx.lineWidth = 1;
+    for(let i=0; i<canvas.width; i+=30) {
+        ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+    }
+    for(let j=0; j<canvas.height; j+=30) {
+        ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
     }
 
-    // Draw Traps
+    // Draw Platforms (Cyber Neon Theme)
+    for (let plat of platforms) {
+        ctx.fillStyle = "#1e293b";
+        ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+        
+        // Neon top border
+        ctx.fillStyle = "#a855f7"; 
+        ctx.fillRect(plat.x, plat.y, plat.width, 4);
+    }
+
+    // Draw Traps (Danger Neon Red)
     for (let trap of traps) {
-        ctx.fillStyle = trap.color;
+        ctx.fillStyle = "#ef4444";
         ctx.fillRect(trap.x, trap.y, trap.width, trap.height);
     }
 
-    // Draw Goal Door
-    ctx.fillStyle = "#ff9f43"; // Orange Door
-    ctx.fillRect(goal.x, goal.y, goal.width, goal.height);
+    // Draw Cosmic Portal (Cyan/Blue gradient vibe)
+    ctx.fillStyle = "#06b6d4";
+    ctx.fillRect(portal.x, portal.y, portal.width, portal.height);
+    ctx.shadowBlur = 0;
 
-    // Draw Player
-    ctx.fillStyle = "#ffffff"; // White block character
+    // Draw Player (Glowing White Stardust Core)
+    ctx.fillStyle = "#f8fafc";
     ctx.fillRect(player.x, player.y, player.width, player.height);
 }
 
@@ -260,7 +270,6 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Start Game
 initLevel();
 gameLoop();
 </script>
