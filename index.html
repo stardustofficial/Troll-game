@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Stardust: Cosmic Deception</title>
     <style>
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
         body {
-            margin: 0;
-            padding: 0;
             background: #090d16;
             color: #f8fafc;
             font-family: 'Segoe UI', Roboto, sans-serif;
@@ -29,73 +27,60 @@
         canvas {
             display: block;
             background: linear-gradient(to bottom, #0b0f19, #131c2e);
-            border-radius: 12px;
         }
-        /* UI Screens */
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             z-index: 10;
-            background: rgba(9, 13, 22, 0.95);
-            border-radius: 12px;
-            transition: opacity 0.3s ease;
+            background: rgba(9, 13, 22, 0.98);
         }
-        .hide { opacity: 0; pointer-events: none; }
+        .hide { display: none !important; }
         
         .studio-title { font-size: 14px; letter-spacing: 6px; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px; }
-        .game-title { font-size: 42px; font-weight: 800; letter-spacing: 3px; background: linear-gradient(135deg, #38bdf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin: 0 0 30px 0; }
+        .game-title { font-size: 42px; font-weight: 800; letter-spacing: 3px; background: linear-gradient(135deg, #38bdf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 30px; }
         
         .btn {
-            padding: 12px 40px; font-size: 18px; font-weight: bold; letter-spacing: 1px;
+            padding: 15px 45px; font-size: 18px; font-weight: bold; letter-spacing: 1px;
             color: #fff; background: linear-gradient(135deg, #0284c7, #7c3aed);
             border: none; border-radius: 30px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
-            transition: transform 0.1s;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4);
         }
-        .btn:active { transform: scale(0.95); }
 
-        /* Mobile Controls Overlay */
+        /* BIGGER & SMOOTHER CONTROLS */
         #controlsOverlay {
             position: absolute;
-            bottom: 15px; left: 0; width: 100%;
+            bottom: 20px; left: 0; width: 100%;
             display: flex; justify-content: space-between;
-            padding: 0 30px; pointer-events: none; z-index: 5;
+            padding: 0 40px; pointer-events: none; z-index: 5;
         }
-        .d-pad, .action-pad { display: flex; gap: 20px; pointer-events: auto; }
+        .d-pad, .action-pad { display: flex; gap: 25px; pointer-events: auto; }
         .ctrl-btn {
-            width: 65px; height: 65px; background: rgba(30, 41, 59, 0.6);
-            border: 2px solid rgba(56, 189, 248, 0.4); border-radius: 50%;
+            width: 80px; height: 80px; background: rgba(30, 41, 59, 0.8);
+            border: 2px solid rgba(56, 189, 248, 0.5); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(6px);
+            touch-action: none;
         }
-        .ctrl-btn active, .ctrl-btn:active { background: rgba(56, 189, 248, 0.4); }
-        .ctrl-btn svg { width: 30px; height: 30px; fill: #38bdf8; }
+        .ctrl-btn:active { background: rgba(56, 189, 248, 0.5); transform: scale(0.95); }
+        .ctrl-btn svg { width: 40px; height: 40px; fill: #38bdf8; }
 
-        /* Rotate Screen Warning */
         #rotateWarning {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #090d16; z-index: 100; display: none;
             flex-direction: column; justify-content: center; align-items: center;
         }
-        #rotateWarning svg { width: 80px; height: 80px; fill: #38bdf8; margin-bottom: 20px; animation: rotateAnim 2s infinite; }
-        @keyframes rotateAnim { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(-90deg); } }
-
-        @media (orientation: portrait) {
-            #rotateWarning { display: flex; }
-        }
+        @media (orientation: portrait) { #rotateWarning { display: flex; } }
     </style>
 </head>
 <body>
 
     <div id="rotateWarning">
-        <svg viewBox="0 0 24 24"><path d="M16 1H8C6.34 1 5 2.34 5 4v16c0 1.66 1.34 3 3 3h8c1.66 0 3-1.34 3-3V4c0-1.66-1.34-3-3-3zm-2 20h-4v-1h4v1zm4.5-3h-13V4h13v14z"/></svg>
-        <h2>Please Rotate Your Phone to Landscape</h2>
+        <h2 style="text-align: center; padding: 20px;">Please Rotate Your Phone to Landscape 🔄</h2>
     </div>
 
     <div id="gameContainer">
-        
         <div id="startScreen" class="screen">
             <div class="studio-title">Stardust Studio Presents</div>
             <h1 class="game-title">Cosmic Deception</h1>
@@ -129,109 +114,107 @@ let gameState = "MENU";
 let currentLevel = 1;
 let deaths = 0;
 
-// Player Data
-let player = { x: 60, y: 350, width: 24, height: 24, speed: 4, velX: 0, velY: 0, jumping: false, grounded: false };
-const gravity = 0.45;
-const friction = 0.85;
+// Player Properties (Neon Capsule)
+let player = { x: 60, y: 300, width: 22, height: 32, speed: 5, velX: 0, velY: 0, jumping: false, grounded: false };
+const gravity = 0.5;
+const friction = 0.82;
 
-// Level Structures (The Architecture)
 let platforms = [];
 let traps = [];
 let portal = { x: 780, y: 340, width: 30, height: 60 };
 
-// Audio Context Setup for Suspension Music (Synth Node Engine)
+// Audio Web API Node Engine
 let audioCtx = null;
-let oscillator = null;
-
-function playSuspensionMusic() {
+function initAudio() {
     if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        oscillator = audioCtx.createOscillator();
+        
+        // Eerie ambient suspense drone oscillator
+        let osc = audioCtx.createOscillator();
         let gainNode = audioCtx.createGain();
-        
-        oscillator.type = 'sawtooth';
-        oscillator.frequency.setValueAtTime(55, audioCtx.currentTime); // Low eerie drone tone
-        
-        // Filter to make it sound muffled/suspenseful
         let filter = audioCtx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(200, audioCtx.currentTime);
 
-        gainNode.gain.setValueAtTime(0.15, audioCtx.currentTime); // Low volume background drone
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(58, audioCtx.currentTime); // Deep bass suspense note
         
-        oscillator.connect(filter);
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(150, audioCtx.currentTime);
+
+        gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+
+        osc.connect(filter);
         filter.connect(gainNode);
         gainNode.connect(audioCtx.destination);
-        oscillator.start();
+        osc.start();
     }
 }
 
-// Level Data Injector (100 levels can scale here)
 function loadLevel(lvl) {
+    // Standard Base Level Setup
     platforms = [
         { x: 0, y: 400, width: 200, height: 80, type: 'solid' },
         { x: 680, y: 400, width: 180, height: 80, type: 'solid' }
     ];
     traps = [];
-    portal.x = 780; portal.y = 340;
 
     if (lvl === 1) {
-        // LEVEL 1: The Rising Ambush
-        platforms.push({ x: 280, y: 400, width: 320, height: 80, type: 'solid' });
-        traps.push({ x: 400, y: 400, width: 24, height: 24, targetY: 376, type: 'rising', triggered: false });
+        // LEVEL 1: Hidden Rising Spike (Blends perfectly with the platform)
+        platforms.push({ x: 200, y: 400, width: 480, height: 80, type: 'solid' });
+        // TriggerX exact trap point par set kiya hai taaki safe na lage
+        traps.push({ x: 420, y: 400, width: 24, height: 30, targetY: 370, type: 'rising', triggerX: 410, triggered: false });
     } else if (lvl === 2) {
-        // LEVEL 2: The Sky Decoy
-        platforms.push({ x: 280, y: 400, width: 150, height: 80, type: 'solid' });
-        platforms.push({ x: 430, y: 400, width: 120, height: 80, type: 'fake', triggered: false, velY: 0 });
-        platforms.push({ x: 550, y: 400, width: 130, height: 80, type: 'solid' });
+        // LEVEL 2: Fake Drop Zone
+        platforms.push({ x: 200, y: 400, width: 200, height: 80, type: 'solid' });
+        platforms.push({ x: 400, y: 400, width: 100, height: 80, type: 'fake', triggered: false, velY: 0 });
+        platforms.push({ x: 500, y: 400, width: 180, height: 80, type: 'solid' });
     } else if (lvl === 3) {
-        // LEVEL 3: Gravity Smash
-        platforms.push({ x: 250, y: 400, width: 450, height: 80, type: 'solid' });
-        traps.push({ x: 480, y: -50, width: 60, height: 40, triggerX: 380, type: 'falling', triggered: false, velY: 0 });
+        // LEVEL 3: Sky Block Attack (Invisible trap till trigger)
+        platforms.push({ x: 200, y: 400, width: 480, height: 80, type: 'solid' });
+        traps.push({ x: 490, y: -60, width: 50, height: 50, triggerX: 480, type: 'falling', triggered: false, velY: 0 });
     } else {
-        // Loop back or victory state wrapper
-        alert("Awesome! You completed the initial zone of Stardust Alpha!");
+        alert("Zone 1 Over! Scaling to next levels...");
         currentLevel = 1;
         loadLevel(1);
     }
 }
 
-// Touch Input Triggers
-let mobileKeys = { Left: false, Right: false, Jump: false };
-function setupTouchEvents() {
-    const setEvent = (id, key) => {
-        const btn = document.getElementById(id);
-        btn.addEventListener("touchstart", (e) => { e.preventDefault(); mobileKeys[key] = true; });
-        btn.addEventListener("touchend", (e) => { e.preventDefault(); mobileKeys[key] = false; });
+// Touch Input Handler
+let activeKeys = { Left: false, Right: false, Jump: false };
+function bindTouchControls() {
+    const link = (id, key) => {
+        const el = document.getElementById(id);
+        el.addEventListener("touchstart", (e) => { e.preventDefault(); activeKeys[key] = true; });
+        el.addEventListener("touchend", (e) => { e.preventDefault(); activeKeys[key] = false; });
     };
-    setEvent("btnLeft", "Left");
-    setEvent("btnRight", "Right");
-    setEvent("btnJump", "Jump");
+    link("btnLeft", "Left");
+    link("btnRight", "Right");
+    link("btnJump", "Jump");
 }
 
 function startGame() {
     document.getElementById("startScreen").classList.add("hide");
     document.getElementById("controlsOverlay").classList.remove("hide");
     gameState = "PLAYING";
-    try { playSuspensionMusic(); } catch(e){}
+    try { initAudio(); } catch(e) {}
     loadLevel(currentLevel);
 }
 
-// Core Loop Physics Engine
+// Fixed Update Loop for Smooth Physics
 function update() {
     if (gameState !== "PLAYING") return;
 
-    if (mobileKeys.Jump && !player.jumping && player.grounded) {
-        player.jumping = true; player.grounded = false; player.velY = -10;
+    if (activeKeys.Jump && !player.jumping && player.grounded) {
+        player.jumping = true; player.grounded = false; player.velY = -11;
     }
-    if (mobileKeys.Left) { if (player.velX > -player.speed) player.velX--; }
-    if (mobileKeys.Right) { if (player.velX < player.speed) player.velX++; }
+    if (activeKeys.Left) { if (player.velX > -player.speed) player.velX -= 0.8; }
+    if (activeKeys.Right) { if (player.velX < player.speed) player.velX += 0.8; }
 
     player.velX *= friction; player.velY += gravity; player.grounded = false;
 
-    // Plat Collision processing
+    // Platform Physics Loop
     for (let plat of platforms) {
-        if (plat.type === 'fake' && plat.triggered) { plat.velY += 0.4; plat.y += plat.velY; }
+        if (plat.type === 'fake' && plat.triggered) { plat.velY += 0.5; plat.y += plat.velY; }
+        
         if (player.x < plat.x + plat.width && player.x + player.width > plat.x &&
             player.y + player.height <= plat.y + 10 && player.y + player.height + player.velY >= plat.y) {
             player.jumping = false; player.grounded = true; player.velY = 0; player.y = plat.y - player.height;
@@ -242,71 +225,81 @@ function update() {
     player.x += player.velX; player.y += player.velY;
     if (player.y > canvas.height) playerDie();
 
-    // Traps System Processing
+    // Frame-Perfect Trap Checking
     for (let trap of traps) {
-        if (trap.type === 'rising' && Math.abs(player.x - trap.x) < 80) trap.triggered = true;
-        if (trap.type === 'rising' && trap.triggered && trap.y > trap.targetY) trap.y -= 5;
-        if (trap.type === 'falling' && player.x > trap.triggerX) trap.triggered = true;
-        if (trap.type === 'falling' && trap.triggered) { trap.velY += 0.6; trap.y += trap.velY; }
+        // Instant trigger on exact match coordinates
+        if (trap.type === 'rising' && player.x >= trap.triggerX) trap.triggered = true;
+        if (trap.type === 'rising' && trap.triggered && trap.y > trap.targetY) trap.y -= 10; // Instantly shoots up
 
+        if (trap.type === 'falling' && player.x >= trap.triggerX) trap.triggered = true;
+        if (trap.type === 'falling' && trap.triggered) { trap.velY += 0.9; trap.y += trap.velY; }
+
+        // Precision Collision bounding box
         if (player.x < trap.x + trap.width && player.x + player.width > trap.x &&
             player.y < trap.y + trap.height && player.y + player.height > trap.y) {
             playerDie();
         }
     }
 
-    // Portal Level Cleared detection
+    // Portal Detection
     if (player.x < portal.x + portal.width && player.x + player.width > portal.x &&
         player.y < portal.y + portal.height && player.y + player.height > portal.y) {
         currentLevel++;
-        player.x = 60; player.y = 350; player.velX = 0; player.velY = 0;
+        player.x = 60; player.y = 300; player.velX = 0; player.velY = 0;
         loadLevel(currentLevel);
     }
 }
 
 function playerDie() {
     deaths++;
-    player.x = 60; player.y = 350; player.velX = 0; player.velY = 0;
+    player.x = 60; player.y = 300; player.velX = 0; player.velY = 0;
     loadLevel(currentLevel);
 }
 
-// Graphic Vector Renderer
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Subtle Grid Space background design
-    ctx.strokeStyle = "rgba(56, 189, 248, 0.04)";
+    // Cosmic Grid Environment Space Lines
+    ctx.strokeStyle = "rgba(56, 189, 248, 0.03)";
+    ctx.lineWidth = 1;
     for(let i=0; i<canvas.width; i+=40) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke(); }
 
     // Render Platforms
     for (let plat of platforms) {
-        ctx.fillStyle = "#1e293b"; ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
-        ctx.fillStyle = "#6366f1"; ctx.fillRect(plat.x, plat.y, plat.width, 3); // Neon horizon line
+        ctx.fillStyle = "#1e293b"; // Theme Dark Slate Blue
+        ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+        
+        ctx.fillStyle = "#6366f1"; // Neon top runner line
+        ctx.fillRect(plat.x, plat.y, plat.width, 2);
     }
 
-    // Render Danger Traps
-    ctx.fillStyle = "#f43f5e";
-    for (let trap of traps) { ctx.fillRect(trap.x, trap.y, trap.width, trap.height); }
+    // Render Traps (Hidden perfectly using platform color `#1e293b` until active)
+    for (let trap of traps) {
+        ctx.fillStyle = trap.triggered ? "#ef4444" : "#1e293b"; 
+        ctx.fillRect(trap.x, trap.y, trap.width, trap.height);
+        if(!trap.triggered) {
+            ctx.fillStyle = "#6366f1"; 
+            ctx.fillRect(trap.x, trap.y, trap.width, 2); // Blends top border seamlessly
+        }
+    }
 
-    // Portal Node Renderer
+    // Portal Glow Block
     ctx.fillStyle = "#06b6d4"; ctx.fillRect(portal.x, portal.y, portal.width, portal.height);
 
-    // DRAW SVG-Style Glow Stardust Player Vector
-    ctx.fillStyle = "#f8fafc";
+    // RENDER NEON STARDUST CAPSULE CHARACTER
+    ctx.fillStyle = "#38bdf8"; // Glow outer capsule body
     ctx.beginPath();
-    let cx = player.x + player.width/2;
-    let cy = player.y + player.height/2;
-    // Four point stardust particle geometry mapping
-    ctx.moveTo(cx, player.y);
-    ctx.lineTo(cx + 6, cy - 6); ctx.lineTo(player.x + player.width, cy); ctx.lineTo(cx + 6, cy + 6);
-    ctx.lineTo(cx, player.y + player.height); ctx.lineTo(cx - 6, cy + 6); ctx.lineTo(player.x, cy);
-    ctx.lineTo(cx - 6, cy - 6); ctx.closePath(); ctx.fill();
+    ctx.roundRect(player.x, player.y, player.width, player.height, 8);
+    ctx.fill();
+    // Inner visor core details
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(player.x + 4, player.y + 6, player.width - 8, 6);
 
-    // Level & Deaths Stats Text Top Center
+    // Data HUD
     if(gameState === "PLAYING") {
-        ctx.fillStyle = "#94a3b8"; ctx.font = "bold 14px sans-serif";
-        ctx.fillText(`ZONE: 0${currentLevel} / 100`, 30, 40);
-        ctx.fillText(`DEATHS: ${deaths}`, 740, 40);
+        ctx.fillStyle = "#94a3b8"; ctx.font = "bold 13px sans-serif";
+        ctx.fillText(`SIMULATION LEVEL: 0${currentLevel} / 100`, 40, 45);
+        ctx.fillText(`DEATHS: ${deaths}`, 730, 45);
     }
 }
 
@@ -316,7 +309,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-setupTouchEvents();
+bindTouchControls();
 gameLoop();
 </script>
 
