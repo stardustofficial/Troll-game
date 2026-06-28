@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Stardust: Cosmic Deception</title>
+    <title>Stardust: Cosmic Deception Ultimate</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
         body {
@@ -23,7 +23,9 @@
             box-shadow: 0 0 50px rgba(56, 189, 248, 0.25);
             border-radius: 16px;
             overflow: hidden;
+            background: #0b0f19;
         }
+        canvas { display: block; }
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -45,7 +47,6 @@
             text-transform: uppercase;
         }
 
-        /* SETTING AUDIO BUTTON */
         #settingAudioBtn {
             position: absolute;
             top: 25px; right: 40px;
@@ -54,30 +55,30 @@
             border: 2px solid rgba(56, 189, 248, 0.5);
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; z-index: 20; pointer-events: auto;
+            cursor: pointer; z-index: 20;
             backdrop-filter: blur(8px);
         }
         #settingAudioBtn svg { width: 24px; height: 24px; fill: #38bdf8; }
 
+        #victoryOverlay { background: rgba(5, 7, 15, 0.7); backdrop-filter: blur(4px); }
         #victoryPopup {
-            background: rgba(5, 7, 15, 0.85);
-            backdrop-filter: blur(8px);
-            border: 2px solid #eab308;
-            box-shadow: 0 0 30px rgba(234, 179, 8, 0.3);
-            border-radius: 12px;
-            padding: 30px 60px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 3px solid #eab308;
+            box-shadow: 0 0 40px rgba(234, 179, 8, 0.4);
+            border-radius: 16px;
+            padding: 40px 70px;
             text-align: center;
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #victoryPopup h2 {
-            font-size: 36px; font-weight: 900;
+            font-size: 42px; font-weight: 900;
             background: linear-gradient(to bottom, #ffe600, #b58600);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-transform: uppercase; letter-spacing: 3px; margin-bottom: 10px;
+            text-transform: uppercase; letter-spacing: 4px; margin-bottom: 12px;
+            filter: drop-shadow(0 2px 10px rgba(234, 179, 8, 0.3));
         }
-        @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* HUD CONTROLS */
         #controlsOverlay {
             position: absolute;
             bottom: 25px; left: 0; width: 100%;
@@ -128,10 +129,10 @@
             <button class="btn" onclick="startGame()">Start Simulation</button>
         </div>
 
-        <div id="victoryOverlay" class="screen hide" style="background: rgba(5,7,15,0.6);">
+        <div id="victoryOverlay" class="screen hide">
             <div id="victoryPopup">
                 <h2 id="victoryText">Level 01 Complete</h2>
-                <p style="color: #a1a1aa; font-size: 14px; letter-spacing: 1px;">PREPARING NEXT PARADOX...</p>
+                <p style="color: #cbd5e1; font-size: 14px; letter-spacing: 2px; font-weight: 600;">LOADING NEXT PARADOX LAB...</p>
             </div>
         </div>
 
@@ -164,67 +165,57 @@ let deaths = 0;
 let isTransitioning = false;
 let portalRotation = 0;
 
-// Player Core
-let player = { x: 60, y: 300, width: 24, height: 34, speed: 5.2, velX: 0, velY: 0, jumping: false, grounded: false };
-const gravity = 0.52;
+// High Precision Collision Player Struct
+let player = { x: 40, y: 360, width: 22, height: 32, speed: 4.8, velX: 0, velY: 0, jumping: false, grounded: false };
+const gravity = 0.54;
 const friction = 0.82;
 
-// Cosmic Particles Environment data
 let stars = [];
 let shootingStars = [];
-for(let i=0; i<45; i++) {
-    stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*2, alpha: Math.random() });
-}
+for(let i=0; i<45; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*2, alpha: Math.random() });
 
 let platforms = [];
 let traps = [];
-let portal = { x: 760, y: 310, width: 50, height: 90 };
+let portal = { x: 770, y: 350, width: 50, height: 90 };
 
-// SOFT AUDIO MELODY SYNTH ENGINE
+// PURE CHROMATIC ARPEGGIO MELODY ENGINE
 let audioCtx = null;
 let masterGain = null;
 let isMuted = false;
-let melodyTimer = null;
 
 function startSoftMelody() {
     if (audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     masterGain = audioCtx.createGain();
-    masterGain.gain.setValueAtTime(0.9, audioCtx.currentTime); // Louder clear setting
+    masterGain.gain.setValueAtTime(0.85, audioCtx.currentTime);
     masterGain.connect(audioCtx.destination);
 
-    // Sweet cosmic crystalline melody matrix notes
-    let melody = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25]; // C4, D4, E4, G4, A4, C5 (Crystal Pentatonic Scale)
+    let melody = [293.66, 329.63, 349.23, 392.00, 440.00, 523.25, 587.33]; 
     let index = 0;
 
-    melodyTimer = setInterval(() => {
+    setInterval(() => {
         if (gameState !== "PLAYING" || isTransitioning || isMuted) return;
-
         let osc = audioCtx.createOscillator();
         let filter = audioCtx.createBiquadFilter();
-        let noteGain = audioCtx.createGain();
+        let gainNode = audioCtx.createGain();
 
-        // Triangle wave creates a beautiful sweet retro crystal music box sound
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(melody[index], audioCtx.currentTime);
-        
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(800, audioCtx.currentTime); // Clear soft cut-off
+        filter.frequency.setValueAtTime(900, audioCtx.currentTime);
 
-        noteGain.gain.setValueAtTime(0, audioCtx.currentTime);
-        noteGain.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + 0.05);
-        noteGain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.25, audioCtx.currentTime + 0.04);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.45);
 
         osc.connect(filter);
-        filter.connect(noteGain);
-        noteGain.connect(masterGain);
-
+        filter.connect(gainNode);
+        gainNode.connect(masterGain);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.6);
+        osc.stop(audioCtx.currentTime + 0.5);
 
-        // Pattern sequencing progression logic
-        index = (index + Math.floor(Math.random() * 3) + 1) % melody.length;
-    }, 280); // Quick crystalline fluid notes
+        index = (index + 1) % melody.length;
+    }, 240);
 }
 
 function toggleAudio() {
@@ -235,32 +226,99 @@ function toggleAudio() {
         masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
         icon.innerHTML = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
     } else {
-        masterGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+        masterGain.gain.setValueAtTime(0.85, audioCtx.currentTime);
         icon.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
     }
 }
 
+// LEVEL CONFIGURATION DATA STORE
 function loadLevel(lvl) {
-    platforms = [
-        { x: 0, y: 400, width: 200, height: 80, type: 'solid' },
-        { x: 680, y: 400, width: 180, height: 80, type: 'solid' }
-    ];
-    traps = [];
+    platforms = []; traps = [];
+    platforms.push({ x: 0, y: 430, width: 140, height: 50 }); // Universal Spawn Pad
 
-    if (lvl === 1) {
-        platforms.push({ x: 200, y: 400, width: 480, height: 80, type: 'solid' });
-        // ANIMATION VALUES ADDED: currentY added for fluid vector slide rendering
-        traps.push({ x: 440, y: 400, currentY: 400, width: 26, height: 35, targetY: 366, type: 'rising', triggerX: 420, triggered: false });
-    } else if (lvl === 2) {
-        platforms.push({ x: 200, y: 400, width: 220, height: 80, type: 'solid' });
-        platforms.push({ x: 420, y: 400, width: 100, height: 80, type: 'fake', triggered: false, velY: 0 });
-        platforms.push({ x: 520, y: 400, width: 160, height: 80, type: 'solid' });
-    } else if (lvl === 3) {
-        platforms.push({ x: 200, y: 400, width: 480, height: 80, type: 'solid' });
-        traps.push({ x: 500, y: -60, currentY: -60, width: 55, height: 55, triggerX: 490, type: 'falling', triggered: false });
-    } else {
-        currentLevel = 1;
-        loadLevel(1);
+    switch(lvl) {
+        case 1:
+            portal.x = 760; portal.y = 340;
+            platforms.push({ x: 140, y: 430, width: 540, height: 50 });
+            platforms.push({ x: 680, y: 430, width: 180, height: 50 });
+            traps.push({ x: 320, y: 430, currentY: 430, width: 35, height: 40, targetY: 395, type: 'rising', triggerX: 260, triggered: false });
+            traps.push({ x: 540, y: 430, currentY: 430, width: 35, height: 40, targetY: 395, type: 'rising', triggerX: 490, triggered: false });
+            break;
+        case 2:
+            portal.x = 760; portal.y = 130;
+            platforms.push({ x: 200, y: 350, width: 160, height: 30 });
+            platforms.push({ x: 420, y: 260, width: 160, height: 30 });
+            platforms.push({ x: 650, y: 220, width: 210, height: 30 });
+            traps.push({ x: 460, y: -45, currentY: -45, width: 45, height: 45, triggerX: 430, type: 'falling', triggered: false });
+            break;
+        case 3:
+            portal.x = 50; portal.y = 130;
+            platforms.push({ x: 200, y: 370, width: 660, height: 30 });
+            platforms.push({ x: 400, y: 240, width: 180, height: 30 });
+            platforms.push({ x: 0, y: 220, width: 160, height: 30 });
+            traps.push({ x: 480, y: 370, currentY: 370, width: 35, height: 35, targetY: 335, type: 'rising', triggerX: 430, triggered: false });
+            break;
+        case 4:
+            portal.x = 780; portal.y = 340;
+            platforms.push({ x: 200, y: 430, width: 500, height: 50 });
+            platforms.push({ x: 240, y: 310, width: 440, height: 30 }); 
+            platforms.push({ x: 700, y: 430, width: 160, height: 50 });
+            traps.push({ x: 380, y: 430, currentY: 430, width: 35, height: 35, targetY: 395, type: 'rising', triggerX: 310, triggered: false });
+            traps.push({ x: 550, y: -80, currentY: -80, width: 40, height: 120, type: 'falling', triggerX: 480, triggered: false });
+            break;
+        case 5:
+            portal.x = 760; portal.y = 110;
+            platforms.push({ x: 180, y: 370, width: 100, height: 110 });
+            platforms.push({ x: 460, y: 240, width: 110, height: 240 });
+            platforms.push({ x: 620, y: 200, width: 240, height: 280 });
+            traps.push({ x: 495, y: 240, currentY: 240, width: 35, height: 35, targetY: 205, type: 'rising', triggerX: 465, triggered: false });
+            break;
+        case 6:
+            portal.x = 770; portal.y = 340;
+            platforms.push({ x: 180, y: 310, width: 260, height: 30 }); 
+            platforms.push({ x: 180, y: 430, width: 500, height: 50 }); 
+            platforms.push({ x: 680, y: 430, width: 180, height: 50 });
+            traps.push({ x: 320, y: 430, currentY: 430, width: 35, height: 35, targetY: 395, type: 'rising', triggerX: 280, triggered: false });
+            traps.push({ x: 300, y: -60, currentY: -60, width: 50, height: 50, triggerX: 220, type: 'falling', triggered: false });
+            break;
+        case 7:
+            portal.x = 50; portal.y = 110;
+            platforms.push({ x: 250, y: 410, width: 220, height: 30 });
+            platforms.push({ x: 520, y: 320, width: 240, height: 30 });
+            platforms.push({ x: 230, y: 220, width: 220, height: 30 });
+            platforms.push({ x: 0, y: 200, width: 150, height: 30 });
+            traps.push({ x: 590, y: 320, currentY: 320, width: 35, height: 35, targetY: 285, type: 'rising', triggerX: 540, triggered: false });
+            traps.push({ x: 300, y: -60, currentY: -60, width: 45, height: 45, triggerX: 260, type: 'falling', triggered: false });
+            break;
+        case 8:
+            portal.x = 760; portal.y = 340;
+            platforms.push({ x: 0, y: 430, width: 260, height: 50 });
+            platforms.push({ x: 580, y: 430, width: 280, height: 50 });
+            traps.push({ x: 630, y: 430, currentY: 430, width: 40, height: 40, targetY: 390, type: 'rising', triggerX: 590, triggered: false });
+            break;
+        case 9:
+            portal.x = 770; portal.y = 110;
+            platforms.push({ x: 180, y: 400, width: 60, height: 80 });
+            platforms.push({ x: 300, y: 350, width: 60, height: 130 });
+            platforms.push({ x: 420, y: 300, width: 60, height: 180 });
+            platforms.push({ x: 540, y: 250, width: 60, height: 230 });
+            platforms.push({ x: 660, y: 200, width: 200, height: 280 });
+            traps.push({ x: 312, y: 350, currentY: 350, width: 35, height: 35, targetY: 315, type: 'rising', triggerX: 300, triggered: false });
+            traps.push({ x: 552, y: 250, currentY: 250, width: 35, height: 35, targetY: 215, type: 'rising', triggerX: 540, triggered: false });
+            break;
+        case 10:
+            portal.x = 780; portal.y = 340;
+            platforms.push({ x: 150, y: 430, width: 200, height: 50 });
+            platforms.push({ x: 350, y: 430, width: 220, height: 50 });
+            platforms.push({ x: 570, y: 430, width: 300, height: 50 });
+            traps.push({ x: 220, y: 430, currentY: 430, width: 35, height: 40, targetY: 390, type: 'rising', triggerX: 190, triggered: false });
+            traps.push({ x: 440, y: -60, currentY: -60, width: 55, height: 55, triggerX: 390, type: 'falling', triggered: false });
+            traps.push({ x: 690, y: 430, currentY: 430, width: 35, height: 40, targetY: 390, type: 'rising', triggerX: 660, triggered: false });
+            break;
+        default:
+            alert("VICTORY! YOU BROKE THE COSMIC SIMULATION!");
+            currentLevel = 1;
+            loadLevel(1);
     }
 }
 
@@ -271,9 +329,7 @@ function bindControls() {
         el.addEventListener("touchstart", (e) => { e.preventDefault(); activeKeys[key] = true; });
         el.addEventListener("touchend", (e) => { e.preventDefault(); activeKeys[key] = false; });
     };
-    hook("btnLeft", "Left");
-    hook("btnRight", "Right");
-    hook("btnJump", "Jump");
+    hook("btnLeft", "Left"); hook("btnRight", "Right"); hook("btnJump", "Jump");
 }
 
 function startGame() {
@@ -285,57 +341,77 @@ function startGame() {
     loadLevel(currentLevel);
 }
 
+// GLITCH-FREE DETECT COLLISION ENGINE
+function checkCollision(rect1, rect2) {
+    return rect1.x < rect2.x + rect2.width &&
+           rect1.x + rect1.width > rect2.x &&
+           rect1.y < rect2.y + rect2.height &&
+           rect1.y + rect1.height > rect2.y;
+}
+
 function update() {
     if (gameState !== "PLAYING" || isTransitioning) return;
 
     portalRotation += 0.03;
 
-    if(Math.random() < 0.015) {
-        shootingStars.push({ x: Math.random()*600, y: 0, vx: 4, vy: 3, len: 25, alpha: 1 });
-    }
+    if(Math.random() < 0.015) shootingStars.push({ x: Math.random()*600, y: 0, vx: 4, vy: 3, len: 25, alpha: 1 });
     for(let s of shootingStars) { s.x += s.vx; s.y += s.vy; s.alpha -= 0.02; }
     shootingStars = shootingStars.filter(s => s.alpha > 0);
 
+    // Input Movement Vector calculation
     if (activeKeys.Jump && !player.jumping && player.grounded) {
         player.jumping = true; player.grounded = false; player.velY = -11.5;
     }
-    if (activeKeys.Left) { if (player.velX > -player.speed) player.velX -= 0.8; }
-    if (activeKeys.Right) { if (player.velX < player.speed) player.velX += 0.8; }
+    if (activeKeys.Left) { if (player.velX > -player.speed) player.velX -= 0.75; }
+    if (activeKeys.Right) { if (player.velX < player.speed) player.velX += 0.75; }
 
-    player.velX *= friction; player.velY += gravity; player.grounded = false;
+    player.velX *= friction; player.velY += gravity;
+    player.grounded = false;
 
+    // Advanced Axis Separated Solid Resolution (Anti-Clipping Fix)
+    player.x += player.velX;
     for (let plat of platforms) {
-        if (plat.type === 'fake' && plat.triggered) { plat.velY += 0.5; plat.y += plat.velY; }
-        if (player.x < plat.x + plat.width && player.x + player.width > plat.x &&
-            player.y + player.height <= plat.y + 10 && player.y + player.height + player.velY >= plat.y) {
-            player.jumping = false; player.grounded = true; player.velY = 0; player.y = plat.y - player.height;
-            if (plat.type === 'fake') plat.triggered = true;
+        if (checkCollision(player, plat)) {
+            if (player.velX > 0) player.x = plat.x - player.width;
+            else if (player.velX < 0) player.x = plat.x + plat.width;
         }
     }
 
-    player.x += player.velX; player.y += player.velY;
+    player.y += player.velY;
+    for (let plat of platforms) {
+        if (checkCollision(player, plat)) {
+            if (player.velY > 0) {
+                player.jumping = false; player.grounded = true; player.velY = 0;
+                player.y = plat.y - player.height;
+            } else if (player.velY < 0) {
+                player.velY = 0; player.y = plat.y + plat.height;
+            }
+        }
+    }
+
+    if(player.x < 0) player.x = 0;
+    if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
     if (player.y > canvas.height) playerDie();
 
+    // Trap Physics & Easing Slide Calculation
     for (let trap of traps) {
         if (player.x >= trap.triggerX) trap.triggered = true;
         
-        // FLUID SMOOTH EASING SLIDE ANIMATION VALUES INTERPOLATION
-        if (trap.type === 'rising' && trap.triggered) {
-            if(trap.currentY > trap.targetY) trap.currentY -= 3.5; // Visible steady float slide up
+        if (trap.type === 'rising' && trap.triggered && trap.currentY > trap.targetY) {
+            trap.currentY -= 3.5;
         }
         if (trap.type === 'falling' && trap.triggered) {
-            trap.currentY += 7.5; // Smooth gravity descent block
+            trap.currentY += 8.2;
         }
 
-        // Active collision binds directly to animated currentY processing
-        if (player.x < trap.x + trap.width && player.x + player.width > trap.x &&
-            player.y < trap.currentY + trap.height && player.y + player.height > trap.currentY) {
+        // Exact Intersection Check against Animated Coordinates
+        let trapBox = { x: trap.x, y: trap.currentY, width: trap.width, height: trap.height };
+        if (checkCollision(player, trapBox)) {
             playerDie();
         }
     }
 
-    if (player.x < portal.x + portal.width && player.x + player.width > portal.x &&
-        player.y < portal.y + portal.height && player.y + player.height > portal.y) {
+    if (checkCollision(player, portal)) {
         triggerVictoryScreen();
     }
 }
@@ -348,7 +424,7 @@ function triggerVictoryScreen() {
     setTimeout(() => {
         document.getElementById("victoryOverlay").classList.add("hide");
         currentLevel++;
-        player.x = 60; player.y = 300; player.velX = 0; player.velY = 0;
+        player.x = 40; player.y = 300; player.velX = 0; player.velY = 0;
         loadLevel(currentLevel);
         isTransitioning = false;
     }, 2200);
@@ -356,15 +432,15 @@ function triggerVictoryScreen() {
 
 function playerDie() {
     deaths++;
-    player.x = 60; player.y = 300; player.velX = 0; player.velY = 0;
+    player.x = 40; player.y = 300; player.velX = 0; player.velY = 0;
     loadLevel(currentLevel);
 }
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#0b0f19"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Twinkle Background
+    // Space Sky System
+    ctx.fillStyle = "#0b0f19"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#fff";
     for(let s of stars) {
         ctx.globalAlpha = Math.abs(Math.sin(Date.now()*0.001 + s.alpha*10));
@@ -373,28 +449,27 @@ function render() {
     ctx.globalAlpha = 1.0;
 
     for(let s of shootingStars) {
-        ctx.strokeStyle = "rgba(255,255,255,0.6)";
+        ctx.strokeStyle = "rgba(255,255,255,0.5)";
         ctx.beginPath(); ctx.globalAlpha = s.alpha; ctx.lineWidth = 2;
         ctx.moveTo(s.x, s.y); ctx.lineTo(s.x - s.len, s.y - s.len*0.7); ctx.stroke();
     }
     ctx.globalAlpha = 1.0;
 
-    // Build Platforms
+    // Solid Environment Blocks
     for (let plat of platforms) {
         ctx.fillStyle = "#131a26"; ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
         ctx.fillStyle = "#4338ca"; ctx.fillRect(plat.x, plat.y, plat.width, 3);
     }
 
-    // MATCHED COLOR TRAPS (Hidden inside environment themes perfectly)
+    // Perfectly Camouflaged Hardcore Traps
     for (let trap of traps) {
-        ctx.fillStyle = "#131a26"; // Exact platform matching theme color
+        ctx.fillStyle = "#131a26";
         ctx.fillRect(trap.x, trap.currentY, trap.width, trap.height);
-        
-        ctx.fillStyle = "#4338ca"; // Top runner edge alignment
+        ctx.fillStyle = "#4338ca";
         ctx.fillRect(trap.x, trap.currentY, trap.width, 3);
     }
 
-    // ADVANCED DETAILED VECTOR NEON PORTAL GATE
+    // Vector Neon Portal Gate Ring
     let pCenterX = portal.x + portal.width / 2;
     let pCenterY = portal.y + portal.height / 2;
     ctx.save(); ctx.translate(pCenterX, pCenterY); ctx.rotate(portalRotation);
@@ -405,16 +480,17 @@ function render() {
     ctx.fillStyle = "rgba(6, 182, 212, 0.4)";
     ctx.beginPath(); ctx.arc(0, 0, 14, 0, Math.PI * 2); ctx.fill(); ctx.restore();
 
-    // Render Jetpack Capsule Pilot
+    // Pixel Jetpack Capsule Hero
     ctx.fillStyle = "#38bdf8"; 
-    ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 10); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 9); ctx.fill();
     ctx.fillStyle = "#0f172a"; ctx.fillRect(player.x + 4, player.y + 6, player.width - 8, 8);
     ctx.fillStyle = "#34d399"; ctx.fillRect(player.x + 6, player.y + 8, 6, 3);
 
+    // Dashboard HUD Display text
     if(gameState === "PLAYING") {
         ctx.fillStyle = "#64748b"; ctx.font = "bold 13px sans-serif";
-        ctx.fillText(`ZONE: 0${currentLevel} / 100`, 40, 45);
-        ctx.fillText(`DEATHS: ${deaths}`, 740, 45);
+        ctx.fillText(`ZONE MATRIX: 0${currentLevel} / 10`, 40, 45);
+        ctx.fillText(`DEATHS: ${deaths}`, 730, 45);
     }
 }
 
