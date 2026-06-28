@@ -19,7 +19,7 @@
             overflow: hidden; background: #050811;
         }
         
-        /* CANVAS BRUSHED TO ABSOLUTE FOREGROUND FOR PERFECT VISIBILITY */
+        /* CANVAS IN MAIN POSITION WITH TOUCH THROUGH FOR BUTTONS */
         canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
         #brandingIntro {
@@ -117,20 +117,21 @@
         #victoryPopup { background: #0b0f19; border: 2px solid #22d3ee; border-radius: 14px; padding: 30px 50px; text-align: center; box-shadow: 0 0 30px rgba(34, 211, 238, 0.3); }
         #victoryPopup h2 { font-size: 26px; font-weight: 900; color: #22d3ee; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* BUTTON LAYERS SET BEHIND CANVAS DESIGN FOR EXCELLENT CHARACTER VISIBILITY */
+        /* BUTTONS OVERLAID PERFECTLY WITH POINTER EVENTS ACTIVE */
         #controlsOverlay {
             position: absolute; bottom: 5%; left: 0; width: 100%;
             display: flex; justify-content: space-between; padding: 0 5%;
-            pointer-events: none; z-index: 2; opacity: 0.65;
+            z-index: 20; opacity: 0.8;
         }
-        .d-pad, .action-pad { display: flex; gap: 18px; pointer-events: auto; }
+        .d-pad, .action-pad { display: flex; gap: 18px; }
         .ctrl-btn {
             width: 64px; height: 64px; background: rgba(11, 15, 25, 0.85);
             border: 2px solid rgba(168, 85, 247, 0.5); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            touch-action: none;
+            touch-action: none; cursor: pointer;
         }
         .ctrl-btn svg { width: 34px; height: 34px; fill: #a855f7; }
+        .ctrl-btn:active { background: rgba(168, 85, 247, 0.3); }
     </style>
 </head>
 <body>
@@ -189,10 +190,9 @@ let currentChapter = 1; let currentSubLevel = 1;
 let maxUnlockedChapter = 1; let deaths = 0;
 let isTransitioning = false; let systemHalted = false; let globalTime = 0;
 
-// RE-CONFIGURED ACCURATE PHYSICS ARCHITECTURE
 let player = { x: 50, y: 300, width: 22, height: 32, speed: 6.0, velX: 0, velY: 0, jumping: false, grounded: false };
 const baseGravity = 0.45; const friction = 0.84;
-let activePlatform = null; // Sticky synchronization lock
+let activePlatform = null; 
 
 let stars = []; for(let i=0; i<45; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.5 });
 let platforms = []; let traps = []; let lasers = [];
@@ -200,6 +200,15 @@ let portal = { x: 750, y: 320, width: 48, height: 85 };
 
 let audioCtx = null, masterGain = null, audioLoopId = null;
 let isMuted = false;
+
+// VISIBILITY/TAB AUTO-PAUSE INTERCEPTOR
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        if (audioCtx && audioCtx.state === "running") { audioCtx.suspend(); }
+    } else {
+        if (audioCtx && audioCtx.state === "suspended" && !isMuted) { audioCtx.resume(); }
+    }
+});
 
 function checkOrientation() {
     if (window.innerHeight > window.innerWidth) { 
@@ -216,15 +225,17 @@ window.addEventListener("load", checkOrientation);
 function startSoftMelody() {
     if (audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    masterGain = audioCtx.createGain(); masterGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    masterGain = audioCtx.createGain(); 
+    masterGain.gain.setValueAtTime(0.85, audioCtx.currentTime); // LOUDER VOLUME SET
     masterGain.connect(audioCtx.destination);
+    
     let sequence = [293.66, 329.63, 349.23, 392.00, 440.00]; let idx = 0;
     audioLoopId = setInterval(() => {
-        if (!audioCtx || isMuted || systemHalted || gameState !== "PLAYING") return;
+        if (!audioCtx || isMuted || systemHalted || gameState !== "PLAYING" || document.hidden) return;
         let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
         osc.type = 'sine'; osc.frequency.setValueAtTime(sequence[idx], audioCtx.currentTime);
         g.gain.setValueAtTime(0, audioCtx.currentTime);
-        g.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + 0.05);
+        g.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.05);
         g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
         osc.connect(g); g.connect(masterGain); osc.start(); osc.stop(audioCtx.currentTime + 0.45);
         idx = (idx + 1) % sequence.length;
@@ -234,6 +245,9 @@ function startSoftMelody() {
 function toggleAudioSystem() {
     isMuted = !isMuted;
     document.getElementById("audioIcon").style.fill = isMuted ? "#64748b" : "#22d3ee";
+    if (audioCtx) {
+        masterGain.gain.setValueAtTime(isMuted ? 0 : 0.85, audioCtx.currentTime);
+    }
 }
 
 function buildUniqueOrbitMap() {
@@ -270,7 +284,6 @@ function refreshUniverseMap() {
     }
 }
 
-// PROCEDURAL HARCODR GENERATOR - 100% DISTINCT COMBINATIONS & EXPANSIVE MAP LAYOUTS
 function loadChapterBlueprint(ch, sub) {
     platforms = []; traps = []; lasers = [];
     activePlatform = null;
@@ -278,13 +291,11 @@ function loadChapterBlueprint(ch, sub) {
     let seed = (ch * 73) + (sub * 31.7);
     let pseudo = (o) => Math.abs(Math.sin(seed + o));
 
-    // Dynamic starting base anchor block
     let baseWidth = 140 + (pseudo(1) * 30);
     let baseY = 390 + (pseudo(2) * 20);
     platforms.push({ x: 0, y: baseY, width: baseWidth, height: 100, type: 'static', vy: 0 });
 
-    // Target Portal Positioning Rules (SAFE REACH LIMIT RE-CALCULATED)
-    portal.x = 730 + (pseudo(3) * 40);
+    portal.x = 750 + (pseudo(3) * 40);
     portal.y = 150 + (pseudo(4) * 160);
     platforms.push({ x: portal.x - 15, y: portal.y + 80, width: 130, height: 320, type: 'static', vy: 0 });
 
@@ -293,7 +304,6 @@ function loadChapterBlueprint(ch, sub) {
 
     while(currentX < portal.x - 130) {
         index++;
-        // STRICT HORIZONTAL GAPS FOR FOOLPROOF JUMP ARCHITECTURE (Max 125px)
         let gap = 90 + (pseudo(currentX + index) * 35);
         let platWidth = 100 + (pseudo(currentX + index + 2) * 40);
         let platY = 300 + (pseudo(currentX + index + 4) * 95);
@@ -310,12 +320,10 @@ function loadChapterBlueprint(ch, sub) {
             baseVal: platY,
             drift: 45 + (pseudo(platX) * 35),
             speedModifier: 0.03 + (pseudo(platY) * 0.02),
-            vy: 0 // Track actual frame velocity differential
+            vy: 0
         });
 
-        // Hardcore Atrangi Danger Element Placements
         if (pseudo(platX) > 0.45) {
-            // NUKILE SPIKE TRAPS DESIGNATOR ATTACHED
             traps.push({ x: platX + (platWidth / 4), y: -60, currentY: -60, width: 36, height: 34, type: 'falling', triggerX: platX - 50, triggered: false });
         } else {
             traps.push({ x: platX + 25, y: platY - 20, width: 25, height: 20, type: 'static' });
@@ -324,7 +332,6 @@ function loadChapterBlueprint(ch, sub) {
         currentX = platX + platWidth;
     }
 
-    // High Density Laser Buffers for Advanced Dimensions
     if (ch > 50 || sub >= 4) {
         lasers.push({ x: 260 + (pseudo(40)*140), y1: 0, y2: 440, speed: 60 + Math.floor(pseudo(9)*40), timer: 0 });
         lasers.push({ x: 500 + (pseudo(41)*120), y1: 0, y2: 440, speed: 65, timer: 30 });
@@ -394,28 +401,24 @@ function update() {
 
     globalTime++;
 
-    // Platform Shift Loop Velocity Track Engine
     for(let plat of platforms) {
         if(plat.type === 'sine') {
             let lastY = plat.y;
             plat.y = plat.baseVal + Math.sin(globalTime * plat.speedModifier) * plat.drift;
-            plat.vy = plat.y - lastY; // Synchronized real-time movement step delta
+            plat.vy = plat.y - lastY; 
         }
     }
 
-    // Input Movement Handler
     if (activeKeys.Left) { if(player.velX > -player.speed) player.velX -= 0.8; }
     if (activeKeys.Right) { if(player.velX < player.speed) player.velX += 0.8; }
     player.velX *= friction;
 
-    // Jump Physics Core Logic
     if (activeKeys.Jump && player.grounded && !player.jumping) {
         player.jumping = true; player.grounded = false;
         player.velY = -12.4; 
         activePlatform = null;
     }
 
-    // Apply Sticky Attachment Vector Correction to eliminate moving platform slip glitches
     if (player.grounded && activePlatform) {
         player.y += activePlatform.vy;
         player.velY = 0;
@@ -423,7 +426,6 @@ function update() {
         player.velY += baseGravity;
     }
 
-    // X Axis collision loops
     player.x += player.velX;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -432,7 +434,6 @@ function update() {
         }
     }
 
-    // Y Axis rigid lock platform system
     player.y += player.velY;
     let currentGrounded = false;
     for (let plat of platforms) {
@@ -453,7 +454,6 @@ function update() {
     if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
     if (player.y > canvas.height || player.y < -50) playerDie();
 
-    // Sudden Trap Actions
     for (let trap of traps) {
         if (player.x >= trap.triggerX) trap.triggered = true;
         if (trap.type === 'falling' && trap.triggered) trap.currentY += 8.5;
@@ -485,7 +485,6 @@ function triggerNextSubLevel() {
         if (currentSubLevel < 5) {
             currentSubLevel++;
         } else {
-            // Chapter Accomplished Transition Vector
             document.getElementById("victoryText").innerText = `Chapter ${currentChapter} Mastered`;
             if (currentChapter === maxUnlockedChapter && maxUnlockedChapter < 100) maxUnlockedChapter++;
             if (currentChapter < 100) currentChapter++;
@@ -510,22 +509,17 @@ function render() {
 
     if (gameState === "WELCOME" || gameState === "MENU" || systemHalted) return;
 
-    // Normal Platform Assets
     for (let plat of platforms) {
         ctx.fillStyle = "#0f1322"; ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
         ctx.fillStyle = "#6366f1"; ctx.fillRect(plat.x, plat.y, plat.width, 3);
     }
 
-    // SPIKED TRAPS RENDERING SYSTEM (Nukile Traps state drawing logic)
     for (let trap of traps) {
         let ty = trap.type === 'falling' ? trap.currentY : trap.y;
-        
-        // Draw standard camouflage structure
         ctx.fillStyle = "#0f1322"; ctx.fillRect(trap.x, ty, trap.width, trap.height);
         ctx.fillStyle = "#6366f1"; ctx.fillRect(trap.x, ty, trap.width, 3);
         
         if(trap.type === 'falling') {
-            // High Visibility Hardcore Spikes drawn on top edge
             ctx.fillStyle = "#ef4444";
             let spikeCount = 3; let spikeWidth = trap.width / spikeCount;
             for(let j=0; j<spikeCount; j++) {
@@ -550,7 +544,6 @@ function render() {
     ctx.strokeStyle = "#22d3ee"; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI*2); ctx.stroke(); ctx.restore();
 
-    // PLAYER RENDERING (Always top layer designator inside context)
     ctx.fillStyle = "#22d3ee";
     ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 6); ctx.fill();
     ctx.fillStyle = "#050811"; ctx.fillRect(player.x + 4, player.y + 6, player.width - 8, 8);
