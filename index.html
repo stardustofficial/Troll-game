@@ -19,7 +19,6 @@
             overflow: hidden; background: #050811;
         }
         
-        /* CANVAS IN MAIN POSITION WITH TOUCH THROUGH FOR BUTTONS */
         canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
         #brandingIntro {
@@ -117,11 +116,10 @@
         #victoryPopup { background: #0b0f19; border: 2px solid #22d3ee; border-radius: 14px; padding: 30px 50px; text-align: center; box-shadow: 0 0 30px rgba(34, 211, 238, 0.3); }
         #victoryPopup h2 { font-size: 26px; font-weight: 900; color: #22d3ee; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* BUTTONS OVERLAID PERFECTLY WITH POINTER EVENTS ACTIVE */
         #controlsOverlay {
             position: absolute; bottom: 5%; left: 0; width: 100%;
             display: flex; justify-content: space-between; padding: 0 5%;
-            z-index: 20; opacity: 0.8;
+            z-index: 20; opacity: 0.85;
         }
         .d-pad, .action-pad { display: flex; gap: 18px; }
         .ctrl-btn {
@@ -192,7 +190,7 @@ let isTransitioning = false; let systemHalted = false; let globalTime = 0;
 
 let player = { x: 50, y: 300, width: 22, height: 32, speed: 6.0, velX: 0, velY: 0, jumping: false, grounded: false };
 const baseGravity = 0.45; const friction = 0.84;
-let activePlatform = null; 
+let activePlatform = null; // Sticky synchronization lock anchor
 
 let stars = []; for(let i=0; i<45; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.5 });
 let platforms = []; let traps = []; let lasers = [];
@@ -201,7 +199,6 @@ let portal = { x: 750, y: 320, width: 48, height: 85 };
 let audioCtx = null, masterGain = null, audioLoopId = null;
 let isMuted = false;
 
-// VISIBILITY/TAB AUTO-PAUSE INTERCEPTOR
 document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
         if (audioCtx && audioCtx.state === "running") { audioCtx.suspend(); }
@@ -226,7 +223,7 @@ function startSoftMelody() {
     if (audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     masterGain = audioCtx.createGain(); 
-    masterGain.gain.setValueAtTime(0.85, audioCtx.currentTime); // LOUDER VOLUME SET
+    masterGain.gain.setValueAtTime(0.85, audioCtx.currentTime); 
     masterGain.connect(audioCtx.destination);
     
     let sequence = [293.66, 329.63, 349.23, 392.00, 440.00]; let idx = 0;
@@ -401,6 +398,7 @@ function update() {
 
     globalTime++;
 
+    // Calculate real velocity delta step for moving platforms
     for(let plat of platforms) {
         if(plat.type === 'sine') {
             let lastY = plat.y;
@@ -419,6 +417,7 @@ function update() {
         activePlatform = null;
     }
 
+    // Sticky Alignment Execution to completely terminate slippery platform push bugs
     if (player.grounded && activePlatform) {
         player.y += activePlatform.vy;
         player.velY = 0;
@@ -426,6 +425,7 @@ function update() {
         player.velY += baseGravity;
     }
 
+    // Horizontal Checks
     player.x += player.velX;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -434,11 +434,13 @@ function update() {
         }
     }
 
+    // Vertical Checks with Enhanced Rigid Boundary Catchers
     player.y += player.velY;
     let currentGrounded = false;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
-            if (player.velY >= 0 && (player.y + player.height - player.velY <= plat.y + 12)) {
+            // Check if player lands onto the top surface zone safely
+            if (player.velY >= 0 && (player.y + player.height - player.velY <= plat.y + 14)) {
                 player.jumping = false; currentGrounded = true; player.velY = 0;
                 player.y = plat.y - player.height;
                 activePlatform = plat;
