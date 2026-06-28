@@ -34,7 +34,6 @@
         
         canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         
-        /* Company Intro - Displayed ONLY on Welcome and Map Screens via ID control */
         #brandingIntro {
             position: absolute;
             top: 4%; right: 4%;
@@ -44,7 +43,6 @@
         #brandingIntro .brand { font-size: calc(10px + 0.4vw); font-weight: bold; letter-spacing: 2px; color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); }
         #brandingIntro .sub { font-size: calc(7px + 0.2vw); letter-spacing: 1px; color: #64748b; margin-top: 1px; }
 
-        /* Mute Button Toggle UI element */
         #audioToggleBtn {
             position: absolute;
             top: 15%; right: 4%;
@@ -57,7 +55,6 @@
         }
         #audioToggleBtn svg { width: 16px; height: 16px; fill: #38bdf8; }
 
-        /* LANDSCAPE MODE CONTROLLER OVERLAY */
         #orientationOverlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #05070f; z-index: 99999;
@@ -120,7 +117,6 @@
         .orbit-2 { width: 60%; height: 70%; }
         .orbit-3 { width: 85%; height: 90%; }
         
-        /* High-Visibility Level Selector Nodes */
         .level-node {
             position: absolute; width: 38px; height: 38px;
             background: #111827; border: 2px solid #3b4252;
@@ -181,7 +177,7 @@
     <div id="gameContainer">
         <div id="brandingIntro">
             <div class="brand">STARDUST QUANTUM LABS</div>
-            <div class="sub">SIMULATION MODULE v4.2-STABLE</div>
+            <div class="sub">SIMULATION MODULE v4.3-STABLE</div>
         </div>
 
         <div id="audioToggleBtn" onclick="toggleAudioSystem()">
@@ -257,9 +253,10 @@ let portalRotation = 0;
 let isMuted = false;
 let systemHalted = false;
 
-let player = { x: 40, y: 350, width: 22, height: 32, speed: 4.8, velX: 0, velY: 0, jumping: false, grounded: false };
-const gravity = 0.52;
-const friction = 0.82;
+// Re-balanced character constants for precise jump arcs across hard gaps
+let player = { x: 40, y: 350, width: 22, height: 32, speed: 5.2, velX: 0, velY: 0, jumping: false, grounded: false };
+const gravity = 0.48;
+const friction = 0.85;
 
 let stars = [];
 let shootingStars = [];
@@ -361,7 +358,7 @@ function refreshUniverseMap() {
         
         if (i <= maxUnlockedLevel) {
             node.classList.add("unlocked");
-            node.innerText = i; // Show standard legible numerals
+            node.innerText = i; 
             if (i === currentLevel) node.classList.add("current");
         } else {
             node.classList.add("locked");
@@ -389,11 +386,11 @@ function loadLevel(lvl) {
             traps.push({ x: 460, y: -45, currentY: -45, width: 45, height: 45, triggerX: 430, type: 'falling', triggered: false });
             break;
         case 3: 
-            // FIXED TRAP: Level 3 Troll parameters re-balanced for clean mechanics
-            portal.x = 60; portal.y = 130;
+            // FIXED LEVEL 3 ARCS: Positioned portal perfectly for enhanced control mechanics
+            portal.x = 45; portal.y = 130;
             platforms.push({ x: 160, y: 360, width: 700, height: 30 });
-            platforms.push({ x: 380, y: 260, width: 220, height: 30 });
-            platforms.push({ x: 0, y: 220, width: 140, height: 30 });  
+            platforms.push({ x: 380, y: 260, width: 240, height: 30 });
+            platforms.push({ x: 0, y: 220, width: 150, height: 30 });  
             traps.push({ x: 290, y: 360, currentY: 360, width: 35, height: 35, targetY: 328, type: 'rising', triggerX: 235, triggered: false });
             break;
         case 4:
@@ -447,7 +444,7 @@ function enterLevelSelector() {
     gameState = "MENU";
     document.getElementById("welcomeScreen").classList.add("hide");
     document.getElementById("homeScreen").classList.remove("hide");
-    document.getElementById("brandingIntro").classList.remove("hide"); // Show on map
+    document.getElementById("brandingIntro").classList.remove("hide"); 
     try { startSoftMelody(); } catch(e){}
     refreshUniverseMap();
 }
@@ -457,7 +454,7 @@ function launchLevel(selectedLvl) {
     currentLevel = selectedLvl;
     saveProgress();
     document.getElementById("homeScreen").classList.add("hide");
-    document.getElementById("brandingIntro").classList.add("hide"); // HIDDEN FROM GAMEPLAY SCREEN
+    document.getElementById("brandingIntro").classList.add("hide"); 
     document.getElementById("controlsOverlay").classList.remove("hide");
     document.getElementById("backToMenuBtn").classList.remove("hide");
     gameState = "PLAYING";
@@ -468,7 +465,7 @@ function launchLevel(selectedLvl) {
 function exitToMenu() {
     gameState = "MENU";
     document.getElementById("homeScreen").classList.remove("hide");
-    document.getElementById("brandingIntro").classList.remove("hide"); // Show again on map
+    document.getElementById("brandingIntro").classList.remove("hide"); 
     document.getElementById("controlsOverlay").classList.add("hide");
     document.getElementById("backToMenuBtn").classList.add("hide");
     refreshUniverseMap();
@@ -500,10 +497,17 @@ function update() {
     shootingStars = shootingStars.filter(s => s.alpha > 0);
 
     if (activeKeys.Jump && !player.jumping && player.grounded) {
-        player.jumping = true; player.grounded = false; player.velY = -11.5;
+        player.jumping = true; player.grounded = false; player.velY = -12.2; // Slightly higher base arc
     }
-    if (activeKeys.Left) { if (player.velX > -player.speed) player.velX -= 0.75; }
-    if (activeKeys.Right) { if (player.velX < player.speed) player.velX += 0.75; }
+    
+    // LEVEL 3 JUMP MECHANIC: Provides aerial velocity balancing to overcome layout distance safely
+    let currentSpeed = player.speed;
+    if (currentLevel === 3 && player.jumping) {
+        currentSpeed = 6.2; 
+    }
+
+    if (activeKeys.Left) { if (player.velX > -currentSpeed) player.velX -= 0.85; }
+    if (activeKeys.Right) { if (player.velX < currentSpeed) player.velX += 0.85; }
 
     player.velX *= friction; player.velY += gravity;
     player.grounded = false;
