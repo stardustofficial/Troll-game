@@ -112,9 +112,38 @@
             text-transform: uppercase;
         }
 
-        #victoryOverlay { background: rgba(3, 5, 9, 0.9) !important; justify-content: center; align-items: center; z-index: 50; }
-        #victoryPopup { background: #0b0f19; border: 2px solid #22d3ee; border-radius: 14px; padding: 30px 50px; text-align: center; box-shadow: 0 0 30px rgba(34, 211, 238, 0.3); }
-        #victoryPopup h2 { font-size: 26px; font-weight: 900; color: #22d3ee; text-transform: uppercase; letter-spacing: 2px; }
+        #victoryOverlay { 
+            background: rgba(3, 5, 9, 0.85) !important; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 50; 
+            backdrop-filter: blur(4px);
+            transition: all 0.3s ease;
+        }
+        #victoryPopup { 
+            background: linear-gradient(135deg, #0b0f19, #071624); 
+            border: 2px solid #22d3ee; 
+            border-radius: 16px; 
+            padding: 35px 60px; 
+            text-align: center; 
+            box-shadow: 0 0 40px rgba(34, 211, 238, 0.4), inset 0 0 20px rgba(34, 211, 238, 0.1);
+            transform: scale(0.6);
+            opacity: 0;
+            animation: cyberPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        #victoryPopup h2 { 
+            font-size: 28px; 
+            font-weight: 900; 
+            color: #22d3ee; 
+            text-transform: uppercase; 
+            letter-spacing: 3px;
+            text-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
+        }
+
+        @keyframes cyberPop {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
         #controlsOverlay {
             position: absolute; bottom: 5%; left: 0; width: 100%;
@@ -190,7 +219,7 @@ let isTransitioning = false; let systemHalted = false; let globalTime = 0;
 
 let player = { x: 50, y: 300, width: 22, height: 32, speed: 6.0, velX: 0, velY: 0, jumping: false, grounded: false };
 const baseGravity = 0.45; const friction = 0.84;
-let activePlatform = null; // Sticky synchronization lock anchor
+let activePlatform = null; 
 
 let stars = []; for(let i=0; i<45; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.5 });
 let platforms = []; let traps = []; let lasers = [];
@@ -239,6 +268,34 @@ function startSoftMelody() {
     }, 320);
 }
 
+function playVictorySound() {
+    if (!audioCtx || isMuted || document.hidden) return;
+    let now = audioCtx.currentTime;
+    
+    let osc1 = audioCtx.createOscillator();
+    let osc2 = audioCtx.createOscillator();
+    let gainNode = audioCtx.createGain();
+    
+    osc1.type = 'square'; osc2.type = 'triangle';
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(0.4, now + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+    
+    osc1.frequency.setValueAtTime(523.25, now); 
+    osc1.frequency.setValueAtTime(659.25, now + 0.1); 
+    osc1.frequency.setValueAtTime(783.99, now + 0.2); 
+    osc1.frequency.setValueAtTime(1046.50, now + 0.3); 
+    
+    osc2.frequency.setValueAtTime(261.63, now); 
+    osc2.frequency.setValueAtTime(392.00, now + 0.15); 
+    
+    osc1.connect(gainNode); osc2.connect(gainNode);
+    gainNode.connect(masterGain);
+    
+    osc1.start(now); osc2.start(now);
+    osc1.stop(now + 0.6); osc2.stop(now + 0.6);
+}
+
 function toggleAudioSystem() {
     isMuted = !isMuted;
     document.getElementById("audioIcon").style.fill = isMuted ? "#64748b" : "#22d3ee";
@@ -263,13 +320,20 @@ function buildUniqueOrbitMap() {
 
 function initPersistence() {
     buildUniqueOrbitMap();
-    const c = localStorage.getItem("zc_max"); const d = localStorage.getItem("zc_deaths");
-    if(c) maxUnlockedChapter = parseInt(c); if(d) deaths = parseInt(d);
+    const c = localStorage.getItem("zc_max"); 
+    const d = localStorage.getItem("zc_deaths");
+    const s = localStorage.getItem("zc_sub"); 
+    
+    if(c) maxUnlockedChapter = parseInt(c); 
+    if(d) deaths = parseInt(d);
+    if(s) currentSubLevel = parseInt(s);
     refreshUniverseMap();
 }
 
 function saveProgress() {
-    localStorage.setItem("zc_max", maxUnlockedChapter); localStorage.setItem("zc_deaths", deaths);
+    localStorage.setItem("zc_max", maxUnlockedChapter); 
+    localStorage.setItem("zc_deaths", deaths);
+    localStorage.setItem("zc_sub", currentSubLevel); 
 }
 
 function refreshUniverseMap() {
@@ -290,11 +354,11 @@ function loadChapterBlueprint(ch, sub) {
 
     let baseWidth = 140 + (pseudo(1) * 30);
     let baseY = 390 + (pseudo(2) * 20);
-    platforms.push({ x: 0, y: baseY, width: baseWidth, height: 100, type: 'static', vy: 0 });
+    platforms.push({ id: 0, x: 0, y: baseY, width: baseWidth, height: 100, type: 'static', vy: 0 });
 
     portal.x = 750 + (pseudo(3) * 40);
     portal.y = 150 + (pseudo(4) * 160);
-    platforms.push({ x: portal.x - 15, y: portal.y + 80, width: 130, height: 320, type: 'static', vy: 0 });
+    platforms.push({ id: 999, x: portal.x - 15, y: portal.y + 80, width: 130, height: 320, type: 'static', vy: 0 });
 
     let currentX = baseWidth;
     let index = 0;
@@ -308,7 +372,8 @@ function loadChapterBlueprint(ch, sub) {
 
         let isMoving = (ch > 50) || (ch <= 50 && pseudo(platX) > 0.6);
         
-        platforms.push({
+        let targetPlat = {
+            id: index,
             x: platX,
             y: platY,
             width: platWidth,
@@ -318,12 +383,24 @@ function loadChapterBlueprint(ch, sub) {
             drift: 45 + (pseudo(platX) * 35),
             speedModifier: 0.03 + (pseudo(platY) * 0.02),
             vy: 0
-        });
+        };
+        platforms.push(targetPlat);
 
         if (pseudo(platX) > 0.45) {
-            traps.push({ x: platX + (platWidth / 4), y: -60, currentY: -60, width: 36, height: 34, type: 'falling', triggerX: platX - 50, triggered: false });
+            traps.push({ 
+                x: platX + (platWidth / 4), 
+                y: -60, 
+                currentY: -60, 
+                width: 36, 
+                height: 34, 
+                type: 'falling', 
+                triggerX: platX - 80, 
+                triggered: false,
+                parentPlatY: platY,
+                dead: false 
+            });
         } else {
-            traps.push({ x: platX + 25, y: platY - 20, width: 25, height: 20, type: 'static' });
+            traps.push({ x: platX + 25, y: platY - 20, width: 25, height: 20, type: 'static', dead: false });
         }
 
         currentX = platX + platWidth;
@@ -345,7 +422,16 @@ function enterLevelSelector() {
 
 function launchChapter(ch) {
     if (ch > maxUnlockedChapter || systemHalted) return;
-    currentChapter = ch; currentSubLevel = 1; saveProgress();
+    currentChapter = ch; 
+    
+    if (ch !== maxUnlockedChapter) {
+        currentSubLevel = 1;
+    } else {
+        const storedSub = localStorage.getItem("zc_sub");
+        currentSubLevel = storedSub ? parseInt(storedSub) : 1;
+    }
+    
+    saveProgress();
     document.getElementById("homeScreen").classList.add("hide");
     document.getElementById("controlsOverlay").classList.remove("hide");
     document.getElementById("backToMenuBtn").classList.remove("hide");
@@ -398,7 +484,6 @@ function update() {
 
     globalTime++;
 
-    // Calculate real velocity delta step for moving platforms
     for(let plat of platforms) {
         if(plat.type === 'sine') {
             let lastY = plat.y;
@@ -417,51 +502,76 @@ function update() {
         activePlatform = null;
     }
 
-    // Sticky Alignment Execution to completely terminate slippery platform push bugs
-    if (player.grounded && activePlatform) {
-        player.y += activePlatform.vy;
-        player.velY = 0;
-    } else {
+    if (!player.grounded) {
         player.velY += baseGravity;
     }
 
-    // Horizontal Checks
     player.x += player.velX;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
-            if (player.velX > 0) player.x = plat.x - player.width;
-            else if (player.velX < 0) player.x = plat.x + plat.width;
-        }
-    }
-
-    // Vertical Checks with Enhanced Rigid Boundary Catchers
-    player.y += player.velY;
-    let currentGrounded = false;
-    for (let plat of platforms) {
-        if (checkCollision(player, plat)) {
-            // Check if player lands onto the top surface zone safely
-            if (player.velY >= 0 && (player.y + player.height - player.velY <= plat.y + 14)) {
-                player.jumping = false; currentGrounded = true; player.velY = 0;
-                player.y = plat.y - player.height;
-                activePlatform = plat;
-            } else if (player.velY < 0) {
-                player.velY = 0; player.y = plat.y + plat.height;
+            if (player.y + player.height <= plat.y + 10) {
+                // Resolved vertically
+            } else {
+                if (player.velX > 0) player.x = plat.x - player.width;
+                else if (player.velX < 0) player.x = plat.x + plat.width;
             }
         }
     }
-    player.grounded = currentGrounded;
+
+    player.y += player.velY;
+    let currentGrounded = false;
+    
+    for (let plat of platforms) {
+        if (checkCollision(player, plat)) {
+            if (player.velY >= 0 || (plat.type === 'sine' && player.y + player.height <= plat.y + 20)) {
+                player.jumping = false; 
+                currentGrounded = true; 
+                player.velY = 0;
+                player.y = plat.y - player.height; 
+                activePlatform = plat;
+            } else if (player.velY < 0) {
+                player.velY = 0; 
+                player.y = plat.y + plat.height;
+            }
+        }
+    }
+
+    if (currentGrounded && activePlatform) {
+        player.y = activePlatform.y - player.height; 
+        player.velY = 0;
+        player.grounded = true;
+    } else {
+        player.grounded = currentGrounded;
+    }
+
     if(!player.grounded) activePlatform = null;
 
     if(player.x < 0) player.x = 0;
     if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
     if (player.y > canvas.height || player.y < -50) playerDie();
 
+    // FIXED INVISIBLE COLLISION LOOP
     for (let trap of traps) {
+        if (trap.dead) continue;
+
         if (player.x >= trap.triggerX) trap.triggered = true;
-        if (trap.type === 'falling' && trap.triggered) trap.currentY += 8.5;
         
-        let box = { x: trap.x, y: trap.type === 'falling' ? trap.currentY : trap.y, width: trap.width, height: trap.height };
-        if (checkCollision(player, box)) playerDie();
+        if (trap.type === 'falling' && trap.triggered) {
+            trap.currentY += 8.5;
+            // CRITICAL GLITCH KILLER: Jaise hi trap platform ke top line ko cross karega, use 'dead' mark kar do
+            if (trap.currentY > trap.parentPlatY + 10) {
+                trap.dead = true;
+                continue;
+            }
+        }
+        
+        let ty = trap.type === 'falling' ? trap.currentY : trap.y;
+        let box = { x: trap.x, y: ty, width: trap.width, height: trap.height };
+        
+        if (checkCollision(player, box)) {
+            playerDie();
+            return;
+        }
     }
 
     for (let laser of lasers) {
@@ -469,6 +579,7 @@ function update() {
             if(player.x + player.width > laser.x && player.x < laser.x + 4) {
                 if(player.y + player.height > laser.y1 && player.y < laser.y2) {
                     playerDie();
+                    return;
                 }
             }
         }
@@ -479,6 +590,8 @@ function update() {
 
 function triggerNextSubLevel() {
     isTransitioning = true;
+    playVictorySound(); 
+    
     document.getElementById("victoryText").innerText = `Sub-Phase 0${currentSubLevel} Stable`;
     document.getElementById("victoryOverlay").classList.remove("hide");
     
@@ -494,7 +607,7 @@ function triggerNextSubLevel() {
         }
         saveProgress(); resetPlayerState();
         loadChapterBlueprint(currentChapter, currentSubLevel); isTransitioning = false;
-    }, 1200);
+    }, 1400);
 }
 
 function playerDie() {
@@ -517,6 +630,7 @@ function render() {
     }
 
     for (let trap of traps) {
+        if (trap.dead) continue;
         let ty = trap.type === 'falling' ? trap.currentY : trap.y;
         ctx.fillStyle = "#0f1322"; ctx.fillRect(trap.x, ty, trap.width, trap.height);
         ctx.fillStyle = "#6366f1"; ctx.fillRect(trap.x, ty, trap.width, 3);
