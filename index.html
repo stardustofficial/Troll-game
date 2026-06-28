@@ -3,136 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Stardust: The 50 Quantum Deceptions</title>
+    <title>Stardust: 50 Unique Deceptions</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
         html, body {
-            background: #020408;
-            color: #f8fafc;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            width: 100vw; height: 100vh;
-            overflow: hidden;
+            background: #010206; color: #f8fafc; font-family: 'Segoe UI', Roboto, sans-serif;
+            width: 100vw; height: 100vh; overflow: hidden;
             display: flex; justify-content: center; align-items: center;
         }
-        
         #gameContainer {
-            position: relative;
-            width: 100%; height: 100%;
-            max-width: 854px; max-height: 480px;
-            aspect-ratio: 16 / 9;
-            box-shadow: 0 0 50px rgba(168, 85, 247, 0.3);
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            border-radius: 16px;
-            overflow: hidden;
-            background: #05070f;
+            position: relative; width: 100%; height: 100%; max-width: 854px; max-height: 480px;
+            aspect-ratio: 16 / 9; box-shadow: 0 0 50px rgba(168, 85, 247, 0.35);
+            border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 16px;
+            overflow: hidden; background: #03050a;
         }
-        
         canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         
         #brandingIntro {
-            position: absolute; top: 4%; right: 4%;
-            text-align: right; z-index: 30;
+            position: absolute; top: 4%; right: 4%; text-align: right; z-index: 30;
             font-family: monospace; pointer-events: none;
         }
-        #brandingIntro .brand { font-size: calc(9px + 0.3vw); font-weight: bold; letter-spacing: 2px; color: #a855f7; text-shadow: 0 0 8px rgba(168, 85, 247, 0.6); }
-        #brandingIntro .sub { font-size: calc(6px + 0.2vw); letter-spacing: 1px; color: #475569; margin-top: 1px; }
-
+        #brandingIntro .brand { font-size: calc(9px + 0.3vw); font-weight: bold; letter-spacing: 2px; color: #a855f7; }
+        
         #audioToggleBtn {
-            position: absolute; top: 14%; right: 4%;
-            width: 32px; height: 32px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
+            position: absolute; top: 14%; right: 4%; width: 32px; height: 32px;
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 40;
         }
         #audioToggleBtn svg { width: 14px; height: 14px; fill: #a855f7; }
 
         #orientationOverlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #020408; z-index: 99999;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
+            background: #010206; z-index: 99999; display: none;
+            flex-direction: column; justify-content: center; align-items: center;
         }
         .phone-icon {
             width: 45px; height: 80px; border: 4px solid #a855f7; border-radius: 8px;
-            position: relative; animation: rotateDevice 2s infinite ease-in-out;
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+            animation: rotateDevice 2s infinite ease-in-out;
         }
-        @keyframes rotateDevice {
-            0% { transform: rotate(0deg); }
-            50% { transform: rotate(-90deg); }
-            100% { transform: rotate(-90deg); }
-        }
-        .rotate-text { font-size: 13px; font-weight: bold; letter-spacing: 2px; color: #a855f7; margin-top: 20px; text-transform: uppercase; }
+        @keyframes rotateDevice { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } }
         
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; z-index: 10; background: #05070f;
+            display: flex; flex-direction: column; z-index: 10; background: #03050a;
         }
         .hide { display: none !important; }
         
-        #welcomeScreen { justify-content: center; align-items: center; }
-        .welcome-title { font-size: calc(20px + 2vw); font-weight: 900; letter-spacing: 4px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 25px; text-shadow: 0 0 30px rgba(168,85,247,0.2); }
-        
-        .btn-launch {
-            padding: 12px 40px; font-size: calc(11px + 0.3vw); font-weight: bold; letter-spacing: 2px;
-            color: #fff; background: linear-gradient(135deg, #7c3aed, #db2777);
-            border: none; border-radius: 25px; cursor: pointer;
-            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
-            text-transform: uppercase; transition: all 0.2s ease;
+        #welcomeScreen { justify-content: center; align-items: center; position: relative; }
+        .welcome-title { font-size: calc(22px + 2vw); font-weight: 900; letter-spacing: 4px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 25px; }
+        .zishan-credits {
+            position: absolute; bottom: 5%; font-size: calc(10px + 0.3vw);
+            font-weight: bold; letter-spacing: 3px; color: #ec4899;
+            text-transform: uppercase; text-shadow: 0 0 10px rgba(236, 72, 153, 0.6);
+            font-family: monospace;
         }
 
-        #homeScreen { padding: 4% 6%; justify-content: flex-start; align-items: flex-start; }
-        .menu-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .menu-title { font-size: calc(14px + 0.6vw); font-weight: 900; letter-spacing: 2px; color: #f8fafc; text-transform: uppercase; }
-        
+        #homeScreen { padding: 4% 6%; }
         .map-scroll-view {
-            width: 100%; height: 75%;
-            background: rgba(10, 15, 30, 0.7);
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            border-radius: 12px; overflow-y: auto; padding: 20px;
-            scroll-behavior: smooth;
+            width: 100%; height: 75%; background: rgba(10, 15, 30, 0.7);
+            border: 1px solid rgba(168, 85, 247, 0.2); border-radius: 12px;
+            overflow-y: auto; padding: 20px;
         }
-        /* Custom scrollbar to keep it sleek */
-        .map-scroll-view::-webkit-scrollbar { width: 6px; }
-        .map-scroll-view::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 10px; }
-
-        .grid-matrix {
-            display: grid; grid-template-columns: repeat(10, 1fr); gap: 12px; width: 100%;
-        }
-        
+        .grid-matrix { display: grid; grid-template-columns: repeat(10, 1fr); gap: 12px; width: 100%; }
         .level-node {
             aspect-ratio: 1; width: 100%; min-width: 35px; max-width: 55px;
-            background: #0f111a; border: 2px solid #334155;
-            border-radius: 10px; display: flex; justify-content: center; align-items: center;
+            background: #0f111a; border: 2px solid #334155; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center;
             cursor: pointer; font-size: 13px; font-weight: bold; color: #64748b;
-            position: relative; transition: all 0.2s;
         }
-        .level-node.unlocked { border-color: #a855f7; color: #e2e8f0; background: #1a102f; box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
+        .level-node.unlocked { border-color: #a855f7; color: #e2e8f0; background: #1a102f; }
         .level-node.current { border-color: #f43f5e; color: #fff; background: #31102f; animation: nodePulse 1.4s infinite ease-in-out; }
-        .level-node.locked { cursor: not-allowed; opacity: 0.4; }
-        .level-node svg { width: 12px; height: 12px; fill: #475569; }
-
-        @keyframes nodePulse {
-            0%, 100% { box-shadow: 0 0 8px rgba(244, 63, 94, 0.5); scale: 1; }
-            50% { box-shadow: 0 0 18px rgba(244, 63, 94, 0.8); scale: 1.05; }
-        }
+        .level-node.locked { cursor: not-allowed; opacity: 0.3; }
+        @keyframes nodePulse { 0%, 100% { scale: 1; } 50% { scale: 1.05; } }
 
         #backToMenuBtn {
-            position: absolute; top: 4%; left: 4%;
-            padding: 6px 16px; background: rgba(10, 15, 30, 0.8);
+            position: absolute; top: 4%; left: 4%; padding: 6px 16px; background: rgba(10, 15, 30, 0.8);
             border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 20px;
             color: #c084fc; font-size: 10px; font-weight: bold; cursor: pointer; z-index: 30;
-            text-transform: uppercase; backdrop-filter: blur(4px);
+            text-transform: uppercase;
         }
-
-        #victoryOverlay { background: rgba(3, 5, 10, 0.85) !important; backdrop-filter: blur(4px); justify-content: center; align-items: center; }
-        #victoryPopup {
-            background: #0f111a; border: 2px solid #a855f7;
-            border-radius: 14px; padding: 20px 40px; text-align: center;
-            box-shadow: 0 0 30px rgba(168,85,247,0.3);
-        }
-        #victoryPopup h2 { font-size: 26px; font-weight: 900; color: #a855f7; text-transform: uppercase; letter-spacing: 2px; }
+        #victoryOverlay { background: rgba(3, 5, 10, 0.9) !important; justify-content: center; align-items: center; }
+        #victoryPopup { background: #0f111a; border: 2px solid #a855f7; border-radius: 14px; padding: 20px 40px; text-align: center; }
+        #victoryPopup h2 { font-size: 24px; color: #a855f7; text-transform: uppercase; }
 
         #controlsOverlay {
             position: absolute; bottom: 6%; left: 0; width: 100%;
@@ -143,26 +96,17 @@
         .ctrl-btn {
             width: 60px; height: 60px; background: rgba(15, 23, 42, 0.7);
             border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            backdrop-filter: blur(4px); touch-action: none;
+            display: flex; justify-content: center; align-items: center; touch-action: none;
         }
         .ctrl-btn svg { width: 30px; height: 30px; fill: #c084fc; }
-        .ctrl-btn:active { background: rgba(168, 85, 247, 0.3); border-color: #a855f7; }
     </style>
 </head>
 <body>
 
-    <div id="orientationOverlay">
-        <div class="phone-icon"></div>
-        <div class="rotate-text">Rotate to Landscape</div>
-    </div>
+    <div id="orientationOverlay"><div class="phone-icon"></div></div>
 
     <div id="gameContainer">
-        <div id="brandingIntro">
-            <div class="brand">QUANTUM CORE ENGINE</div>
-            <div class="sub">50 DECEPTIONS ARCHITECTURE v5.0</div>
-        </div>
-
+        <div id="brandingIntro"><div class="brand">QUANTUM SYSTEM ENGINE</div></div>
         <div id="audioToggleBtn" onclick="toggleAudioSystem()">
             <svg id="audioIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
         </div>
@@ -170,40 +114,28 @@
         <button id="backToMenuBtn" class="hide" onclick="exitToMenu()">Abort Mission</button>
 
         <div id="welcomeScreen" class="screen">
-            <h1 class="welcome-title">Level 50: Chaos</h1>
-            <button class="btn-launch" onclick="enterLevelSelector()">Initialize Matrix</button>
+            <h1 class="welcome-title">Cosmic Chaos</h1>
+            <button class="btn-launch" onclick="enterLevelSelector()">Start Matrix</button>
+            <div class="zishan-credits">Made by Zishan</div>
         </div>
 
         <div id="homeScreen" class="screen hide">
-            <div class="menu-header">
-                <h1 class="menu-title">Select Core Dimension</h1>
-            </div>
             <div class="map-scroll-view">
-                <div class="grid-matrix" id="matrixContainer">
-                    </div>
+                <div class="grid-matrix" id="matrixContainer"></div>
             </div>
         </div>
 
         <div id="victoryOverlay" class="screen hide">
-            <div id="victoryPopup">
-                <h2 id="victoryText">Dimension Fractured</h2>
-                <p style="color: #64748b; font-size: 10px; letter-spacing: 2px; margin-top:5px;">SHIFTING QUANTUM COORDINATES...</p>
-            </div>
+            <div id="victoryPopup"><h2 id="victoryText">Dimension Cleared</h2></div>
         </div>
 
         <div id="controlsOverlay" class="hide">
             <div class="d-pad">
-                <div class="ctrl-btn" id="btnLeft">
-                    <svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
-                </div>
-                <div class="ctrl-btn" id="btnRight">
-                    <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
-                </div>
+                <div class="ctrl-btn" id="btnLeft"><svg viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg></div>
+                <div class="ctrl-btn" id="btnRight"><svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg></div>
             </div>
             <div class="action-pad">
-                <div class="ctrl-btn" id="btnJump">
-                    <svg viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg>
-                </div>
+                <div class="ctrl-btn" id="btnJump"><svg viewBox="0 0 24 24"><path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/></svg></div>
             </div>
         </div>
 
@@ -215,212 +147,154 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 let gameState = "WELCOME";
-let currentLevel = 1;
-let maxUnlockedLevel = 1;
-let deaths = 0;
-let isTransitioning = false;
-let systemHalted = false;
-let globalTime = 0;
+let currentLevel = 1; let maxUnlockedLevel = 1; let deaths = 0;
+let isTransitioning = false; let systemHalted = false; let globalTime = 0;
 
-// Player Core Physics
-let player = { x: 40, y: 350, width: 22, height: 30, speed: 5.5, velX: 0, velY: 0, jumping: false, grounded: false };
-const baseGravity = 0.52;
-const friction = 0.84;
+let player = { x: 40, y: 350, width: 22, height: 30, speed: 5.4, velX: 0, velY: 0, jumping: false, grounded: false };
+const baseGravity = 0.52; const friction = 0.84;
 
-let stars = [];
-for(let i=0; i<45; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.5+0.5 });
-
-let platforms = [];
-let traps = [];
-let lasers = [];
+let stars = []; for(let i=0; i<40; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.5 });
+let platforms = []; let traps = []; let lasers = [];
 let portal = { x: 750, y: 340, width: 45, height: 80 };
 
-// Sound generator system
-let audioCtx = null, masterGain = null, audioLoopId = null;
-let isMuted = false;
-
-function startSoftMelody() {
-    if (audioCtx) return;
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    masterGain = audioCtx.createGain(); masterGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
-    masterGain.connect(audioCtx.destination);
-    let notes = [220, 261, 293, 329, 392, 440]; let idx = 0;
-    audioLoopId = setInterval(() => {
-        if (!audioCtx || isMuted || systemHalted || gameState !== "PLAYING") return;
-        let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
-        osc.type = 'triangle'; osc.frequency.setValueAtTime(notes[idx], audioCtx.currentTime);
-        g.gain.setValueAtTime(0, audioCtx.currentTime);
-        g.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime+0.05);
-        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.5);
-        osc.connect(g); g.connect(masterGain); osc.start(); osc.stop(audioCtx.currentTime+0.6);
-        idx = (idx + 1) % notes.length;
-    }, 400);
-}
-
-function toggleAudioSystem() {
-    isMuted = !isMuted;
-    document.getElementById("audioIcon").style.fill = isMuted ? "#475569" : "#a855f7";
-}
+let audioCtx = null, masterGain = null; let isMuted = false;
 
 function checkOrientation() {
-    if (window.innerHeight > window.innerWidth) {
-        document.getElementById("orientationOverlay").style.display = "flex"; systemHalted = true;
-    } else {
-        document.getElementById("orientationOverlay").style.display = "none"; systemHalted = false;
-    }
+    if (window.innerHeight > window.innerWidth) { document.getElementById("orientationOverlay").style.display = "flex"; systemHalted = true; }
+    else { document.getElementById("orientationOverlay").style.display = "none"; systemHalted = false; }
 }
-window.addEventListener("resize", checkOrientation);
-window.addEventListener("load", checkOrientation);
+window.addEventListener("resize", checkOrientation); window.addEventListener("load", checkOrientation);
 
-// Generation of the 50 Nodes inside HTML layout Grid
 function generateMatrixUI() {
-    const container = document.getElementById("matrixContainer");
-    container.innerHTML = "";
+    const container = document.getElementById("matrixContainer"); container.innerHTML = "";
     for(let i=1; i<=50; i++) {
-        const d = document.createElement("div");
-        d.id = `node-${i}`;
-        d.onclick = () => launchLevel(i);
-        container.appendChild(d);
+        const d = document.createElement("div"); d.id = `node-${i}`;
+        d.onclick = () => launchLevel(i); container.appendChild(d);
     }
 }
 
 function initPersistence() {
     generateMatrixUI();
-    const l = localStorage.getItem("s50_max");
-    const c = localStorage.getItem("s50_curr");
-    const d = localStorage.getItem("s50_deaths");
-    if(l) maxUnlockedLevel = parseInt(l);
-    if(c) currentLevel = parseInt(c);
-    if(d) deaths = parseInt(d);
+    const l = localStorage.getItem("sz50_max"); const c = localStorage.getItem("sz50_curr"); const d = localStorage.getItem("sz50_deaths");
+    if(l) maxUnlockedLevel = parseInt(l); if(c) currentLevel = parseInt(c); if(d) deaths = parseInt(d);
     refreshUniverseMap();
 }
 
 function saveProgress() {
-    localStorage.setItem("s50_max", maxUnlockedLevel);
-    localStorage.setItem("s50_curr", currentLevel);
-    localStorage.setItem("s50_deaths", deaths);
+    localStorage.setItem("sz50_max", maxUnlockedLevel); localStorage.setItem("sz50_curr", currentLevel); localStorage.setItem("sz50_deaths", deaths);
 }
 
 function refreshUniverseMap() {
     for(let i=1; i<=50; i++) {
-        const node = document.getElementById(`node-${i}`);
-        if(!node) continue;
-        node.className = "level-node";
-        if(i <= maxUnlockedLevel) {
-            node.classList.add("unlocked");
-            node.innerText = i;
-            if(i === currentLevel) node.classList.add("current");
-        } else {
-            node.classList.add("locked");
-            node.innerHTML = `<svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/></svg>`;
-        }
+        const n = document.getElementById(`node-${i}`); if(!n) continue;
+        n.className = "level-node";
+        if(i <= maxUnlockedLevel) { n.classList.add("unlocked"); n.innerText = i; if(i === currentLevel) n.classList.add("current"); }
+        else { n.classList.add("locked"); n.innerHTML = `🔒`; }
     }
 }
 
-// Procedural Pro-Level Blueprint Logic (50 Fully Structured Maps)
+// 100% UNINTERRUPTED PROCEDURAL BLUEPRINT - 50 COMPLETELY DISTINCT GENERATIONS
 function loadLevelBlueprint(lvl) {
     platforms = []; traps = []; lasers = [];
-    
-    // Check if it's a Flying level zone (Levels 16 to 30)
+    let seed = lvl * 123.45;
+    let pseudoRand = (offset) => Math.abs(Math.sin(seed + offset));
+
     let isFlyingZone = (lvl >= 16 && lvl <= 30);
 
-    // Initial safe zone logic
+    // Initial spawning floor anchor unique per level layout
     if (!isFlyingZone) {
-        platforms.push({ x: 0, y: 420, width: 120, height: 60 });
+        platforms.push({ x: 0, y: 400 + (pseudoRand(1) * 30), width: 100 + (pseudoRand(2) * 50), height: 80 });
     } else {
-        // Jetpack/Flying level entry point platform
-        platforms.push({ x: 0, y: 360, width: 80, height: 120 });
+        platforms.push({ x: 0, y: 320, width: 80, height: 160 });
     }
 
-    // Dynamic procedural assignment per tier
-    if(lvl <= 15) { 
-        // Tier 1: Hardcore Space (Large fixed gaps, sudden trap ceilings)
-        portal.x = 760; portal.y = 340;
-        platforms.push({ x: 180, y: 420, width: 100, height: 60 });
-        platforms.push({ x: 380, y: 350, width: 120, height: 30 });
-        platforms.push({ x: 620, y: 420, width: 240, height: 60 });
-        
-        // Sudden spikes/traps
-        traps.push({ x: 220, y: 420, width: 30, height: 30, type: 'static' });
-        if(lvl >= 8) {
-            // Level 8 Extended Gap Fixer Platform (Reveals as trick)
-            platforms.push({ x: 280, y: 420, width: 100, height: 20, isFake: false }); 
-            traps.push({ x: 410, y: -50, currentY: -50, width: 40, height: 40, type: 'falling', triggerX: 350, triggered: false });
+    // Portal setup based strictly on uniquely distinct offsets
+    portal.x = 740 + (pseudoRand(3) * 40);
+    portal.y = 150 + (pseudoRand(4) * 230);
+    platforms.push({ x: portal.x - 20, y: portal.y + 75, width: 90, height: 200 });
+
+    if (lvl <= 15) {
+        // TIER 1: Classic Extreme Gaps + Sudden Ceiling Crushes
+        let intermediateX = 220 + (pseudoRand(5) * 120);
+        let intermediateY = 380 + (pseudoRand(6) * 40);
+        platforms.push({ x: intermediateX, y: intermediateY, width: 110, height: 50 });
+
+        let intermediateX2 = 460 + (pseudoRand(7) * 120);
+        platforms.push({ x: intermediateX2, y: 350 + (pseudoRand(8) * 40), width: 90, height: 50 });
+
+        // Level 8 custom logic gap handling perfectly optimized
+        if (lvl === 8) {
+            platforms.push({ x: 360, y: 410, width: 70, height: 20 });
         }
-    } 
-    else if(lvl <= 30) { 
-        // Tier 2: Zero-Gravity Jetpack/Flying Zone (NO Ground platforms, dense traps)
-        portal.x = 770; portal.y = 200;
-        // Float blocks scattered along the route
-        platforms.push({ x: 250, y: 220, width: 80, height: 30 });
-        platforms.push({ x: 500, y: 320, width: 80, height: 30 });
-        platforms.push({ x: 720, y: 280, width: 140, height: 200 });
 
-        // Moving obstacle lasers across the flight route
-        lasers.push({ x: 180, y1: 50, y2: 320, state: true, timer: 0, speed: 120 });
-        lasers.push({ x: 400, y1: 150, y2: 450, state: true, timer: 40, speed: 100 });
-        lasers.push({ x: 620, y1: 20, y2: 300, state: true, timer: 80, speed: 140 });
+        traps.push({ x: intermediateX + 30, y: intermediateY - 24, width: 24, height: 24, type: 'static' });
+        traps.push({ x: intermediateX2 + 20, y: -50, currentY: -50, width: 35, height: 35, type: 'falling', triggerX: intermediateX, triggered: false });
     } 
-    else if(lvl <= 45) { 
-        // Tier 3: Quantum Shifts (Dynamic platform shifts & cycles)
-        portal.x = 750; portal.y = 140;
-        platforms.push({ x: 160, y: 340, width: 140, height: 30, baseId: 1 });
-        platforms.push({ x: 380, y: 260, width: 150, height: 30, baseId: 2 });
-        platforms.push({ x: 620, y: 200, width: 240, height: 280 });
-        
-        // Dynamic cyclical traps
-        traps.push({ x: 200, y: 340, width: 30, height: 30, type: 'static' });
-        traps.push({ x: 440, y: 260, width: 30, height: 30, type: 'static' });
-    } 
-    else { 
-        // Tier 4: Ultimate Quantum Core (Mega long maps, extreme sync required)
-        portal.x = 780; portal.y = 340;
-        platforms.push({ x: 150, y: 400, width: 90, height: 80 });
-        platforms.push({ x: 300, y: 300, width: 90, height: 180 });
-        platforms.push({ x: 450, y: 220, width: 90, height: 260 });
-        platforms.push({ x: 600, y: 320, width: 90, height: 160 });
-        platforms.push({ x: 740, y: 420, width: 125, height: 60 });
+    else if (lvl <= 30) {
+        // TIER 2: Fixed Sky Floating Jetpack Mode (Absolutely no baseline safety grids)
+        let fX1 = 200 + (pseudoRand(10) * 100);
+        let fY1 = 180 + (pseudoRand(11) * 100);
+        platforms.push({ x: fX1, y: fY1, width: 80, height: 25 });
 
-        // Dual Moving laser system + falling ceiling traps
-        lasers.push({ x: 270, y1: 0, y2: 400, state: true, timer: 0, speed: 80 });
-        lasers.push({ x: 570, y1: 0, y2: 400, state: true, timer: 30, speed: 80 });
-        traps.push({ x: 320, y: -40, currentY: -40, width: 40, height: 40, type: 'falling', triggerX: 250, triggered: false });
+        let fX2 = 450 + (pseudoRand(12) * 100);
+        let fY2 = 220 + (pseudoRand(13) * 100);
+        platforms.push({ x: fX2, y: fY2, width: 80, height: 25 });
+
+        // Obstacle beam logic lines matching exact dynamic tracking markers
+        lasers.push({ x: fX1 - 40, y1: 20, y2: 360, state: true, timer: Math.floor(pseudoRand(14)*50), speed: 90 + (pseudoRand(15)*60) });
+        lasers.push({ x: fX2 - 40, y1: 100, y2: 460, state: true, timer: Math.floor(pseudoRand(16)*50), speed: 80 + (pseudoRand(17)*50) });
+    } 
+    else if (lvl <= 45) {
+        // TIER 3: Re-engineered Quantum Cycles (GLITCH FREE FIXED POSITION TRACKING)
+        let mX1 = 180 + (pseudoRand(20) * 80);
+        let mY1 = 330;
+        platforms.push({ x: mX1, y: mY1, width: 120, height: 25, cycleType: 'sine', baseVal: mY1, drift: 40 + (pseudoRand(21)*30) });
+
+        let mX2 = 420 + (pseudoRand(22) * 80);
+        let mY2 = 250;
+        platforms.push({ x: mX2, y: mY2, width: 120, height: 25, cycleType: 'cos', baseVal: mY2, drift: 40 + (pseudoRand(23)*30) });
+
+        traps.push({ x: mX1 + 40, y: 0, currentY: -30, width: 30, height: 30, type: 'falling', triggerX: mX1 - 20, triggered: false });
+    } 
+    else {
+        // TIER 4: Ultimate Quantum Core (Complex architectural integrations)
+        let sX1 = 160; platforms.push({ x: sX1, y: 380, width: 80, height: 120 });
+        let sX2 = 320; platforms.push({ x: sX2, y: 290, width: 80, height: 210 });
+        let sX3 = 480; platforms.push({ x: sX3, y: 220, width: 80, height: 280 });
+        let sX4 = 620; platforms.push({ x: sX4, y: 310, width: 80, height: 190 });
+
+        lasers.push({ x: 280, y1: 0, y2: 440, state: true, timer: 0, speed: 70 });
+        lasers.push({ x: 440, y1: 0, y2: 440, state: true, timer: 25, speed: 70 });
+        lasers.push({ x: 590, y1: 0, y2: 440, state: true, timer: 50, speed: 70 });
     }
 }
 
 function enterLevelSelector() {
-    if(systemHalted) return;
-    gameState = "MENU";
+    if(systemHalted) return; gameState = "MENU";
     document.getElementById("welcomeScreen").classList.add("hide");
     document.getElementById("homeScreen").classList.remove("hide");
-    try { startSoftMelody(); } catch(e){}
     refreshUniverseMap();
 }
 
 function launchLevel(selectedLvl) {
     if (selectedLvl > maxUnlockedLevel || systemHalted) return;
-    currentLevel = selectedLvl;
-    saveProgress();
+    currentLevel = selectedLvl; saveProgress();
     document.getElementById("homeScreen").classList.add("hide");
-    document.getElementById("brandingIntro").classList.add("hide"); 
     document.getElementById("controlsOverlay").classList.remove("hide");
     document.getElementById("backToMenuBtn").classList.remove("hide");
     gameState = "PLAYING";
-    
-    player.x = 30; player.y = 250; player.velX = 0; player.velY = 0;
+    player.x = 30; player.y = 200; player.velX = 0; player.velY = 0;
     loadLevelBlueprint(currentLevel);
 }
 
 function exitToMenu() {
     gameState = "MENU";
     document.getElementById("homeScreen").classList.remove("hide");
-    document.getElementById("brandingIntro").classList.remove("hide"); 
     document.getElementById("controlsOverlay").classList.add("hide");
     document.getElementById("backToMenuBtn").classList.add("hide");
     refreshUniverseMap();
 }
 
-// Controller Hooks
 let activeKeys = { Left: false, Right: false, Jump: false };
 function bindControls() {
     const bind = (id, key) => {
@@ -432,8 +306,7 @@ function bindControls() {
 }
 
 function checkCollision(r1, r2) {
-    return r1.x < r2.x + r2.width && r1.x + r1.width > r2.x &&
-           r1.y < r2.y + r2.height && r1.y + r1.height > r2.y;
+    return r1.x < r2.x + r2.width && r1.x + r1.width > r2.x && r1.y < r2.y + r2.height && r1.y + r1.height > r2.y;
 }
 
 function update() {
@@ -442,20 +315,14 @@ function update() {
     globalTime++;
     let isFlyingZone = (currentLevel >= 16 && currentLevel <= 30);
 
-    // 1. Core Physics Processing (Separate logic for Flying Levels)
+    // Jetpack engine flight state check vs regular platforming arc gravity lines
     if (isFlyingZone) {
-        // Flying System Mode: Jump gives upward jet thruster propulsion
-        if (activeKeys.Jump) {
-            player.velY -= 0.65;
-            if(player.velY < -5.5) player.velY = -5.5;
-        } else {
-            player.velY += 0.32; // Light zero-gravity fallback drag
-        }
+        if (activeKeys.Jump) { player.velY -= 0.65; if(player.velY < -5.2) player.velY = -5.2; }
+        else { player.velY += 0.32; }
     } else {
-        // Classic Hardcore Platformer Jumping
         if (activeKeys.Jump && !player.jumping && player.grounded) {
-            player.jumping = true; player.grounded = false; 
-            player.velY = (currentLevel === 8) ? -13.0 : -11.8; // Extended launch momentum specifically for level 8 gap
+            player.jumping = true; player.grounded = false;
+            player.velY = (currentLevel === 8) ? -13.2 : -11.8;
         }
         player.velY += baseGravity;
     }
@@ -463,18 +330,17 @@ function update() {
     if (activeKeys.Left) { if(player.velX > -player.speed) player.velX -= 0.8; }
     if (activeKeys.Right) { if(player.velX < player.speed) player.velX += 0.8; }
     
-    player.velX *= friction;
-    player.grounded = false;
+    player.velX *= friction; player.grounded = false;
 
-    // 2. Dynamic platform shift calculations (Tier 3 levels)
+    // Fixed Dynamic tracking loop preventing position flickering/glitches
     if(currentLevel >= 31 && currentLevel <= 45) {
         for(let plat of platforms) {
-            if(plat.baseId === 1) plat.y = 340 + Math.sin(globalTime * 0.04) * 35;
-            if(plat.baseId === 2) plat.y = 260 + Math.cos(globalTime * 0.04) * 35;
+            if(plat.cycleType === 'sine') plat.y = plat.baseVal + Math.sin(globalTime * 0.04) * plat.drift;
+            if(plat.cycleType === 'cos') plat.y = plat.baseVal + Math.cos(globalTime * 0.04) * plat.drift;
         }
     }
 
-    // Horizontal position updates
+    // Precise Collision pass routine sequence handling both X and Y bounds perfectly
     player.x += player.velX;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -483,7 +349,6 @@ function update() {
         }
     }
 
-    // Vertical position updates
     player.y += player.velY;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -496,12 +361,10 @@ function update() {
         }
     }
 
-    // Screen Boundary locks
     if(player.x < 0) player.x = 0;
     if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
     if (player.y > canvas.height || player.y < -40) playerDie();
 
-    // 3. Spikes and Trap Actions
     for (let trap of traps) {
         if (player.x >= trap.triggerX) trap.triggered = true;
         if (trap.type === 'falling' && trap.triggered) trap.currentY += 8.5;
@@ -510,13 +373,8 @@ function update() {
         if (checkCollision(player, box)) playerDie();
     }
 
-    // 4. Moving Laser Triggers
     for (let laser of lasers) {
-        laser.timer++;
-        if(laser.timer % laser.speed === 0) laser.state = !laser.state;
-        
-        if(laser.state) {
-            // Collision line interception check
+        if((globalTime + laser.timer) % laser.speed < laser.speed * 0.6) {
             if(player.x + player.width > laser.x && player.x < laser.x + 4) {
                 if(player.y + player.height > laser.y1 && player.y < laser.y2) {
                     playerDie();
@@ -525,97 +383,71 @@ function update() {
         }
     }
 
-    // Check level progression portal collision
     if (checkCollision(player, portal)) triggerNextDimension();
 }
 
 function triggerNextDimension() {
     isTransitioning = true;
-    document.getElementById("victoryText").innerText = `Dimension 0${currentLevel} Cleared`;
     document.getElementById("victoryOverlay").classList.remove("hide");
     setTimeout(() => {
         document.getElementById("victoryOverlay").classList.add("hide");
         if (currentLevel === maxUnlockedLevel && maxUnlockedLevel < 50) maxUnlockedLevel++;
         if (currentLevel < 50) currentLevel++;
-        saveProgress();
-        player.x = 30; player.y = 250; player.velX = 0; player.velY = 0;
-        loadLevelBlueprint(currentLevel);
-        isTransitioning = false;
-    }, 1800);
+        saveProgress(); player.x = 30; player.y = 200; player.velX = 0; player.velY = 0;
+        loadLevelBlueprint(currentLevel); isTransitioning = false;
+    }, 1200);
 }
 
 function playerDie() {
-    deaths++;
-    saveProgress();
-    player.x = 30; player.y = 250; player.velX = 0; player.velY = 0;
+    deaths++; saveProgress();
+    player.x = 30; player.y = 200; player.velX = 0; player.velY = 0;
     loadLevelBlueprint(currentLevel);
 }
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#05070f"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#03050a"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Draw Space Matrix Background particles
-    ctx.fillStyle = "rgba(168, 85, 247, 0.4)";
+    ctx.fillStyle = "rgba(168, 85, 247, 0.35)";
     for(let s of stars) ctx.fillRect(s.x, s.y, s.size, s.size);
 
     if (gameState === "WELCOME" || gameState === "MENU" || systemHalted) return;
 
-    // Platform Render Engine
     for (let plat of platforms) {
         ctx.fillStyle = "#0f111a"; ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
         ctx.fillStyle = "#7c3aed"; ctx.fillRect(plat.x, plat.y, plat.width, 3);
     }
 
-    // Traps / Spikes Render Engine
     for (let trap of traps) {
         let ty = trap.type === 'falling' ? trap.currentY : trap.y;
         ctx.fillStyle = "#1e112a"; ctx.fillRect(trap.x, ty, trap.width, trap.height);
         ctx.fillStyle = "#ef4444"; ctx.fillRect(trap.x, ty, trap.width, 3);
     }
 
-    // Dangerous Lasers System Render Engine
     for (let laser of lasers) {
-        if(laser.state) {
-            ctx.strokeStyle = "rgba(239, 68, 68, 0.85)"; ctx.lineWidth = 4;
-            ctx.shadowBlur = 15; ctx.shadowColor = "#ef4444";
+        if((globalTime + laser.timer) % laser.speed < laser.speed * 0.6) {
+            ctx.strokeStyle = "rgba(255, 50, 50, 0.9)"; ctx.lineWidth = 4;
             ctx.beginPath(); ctx.moveTo(laser.x, laser.y1); ctx.lineTo(laser.x, laser.y2); ctx.stroke();
-            ctx.shadowBlur = 0; // Reset canvas glow
         }
     }
 
-    // Dimensional Wormhole Portal Rendering
     let pX = portal.x + portal.width/2, pY = portal.y + portal.height/2;
     ctx.save(); ctx.translate(pX, pY); ctx.rotate(globalTime * 0.04);
-    ctx.strokeStyle = (currentLevel >= 16 && currentLevel <= 30) ? "#ec4899" : "#a855f7"; 
-    ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI*2); ctx.stroke();
-    ctx.restore();
+    ctx.strokeStyle = isFlyingZone ? "#ec4899" : "#a855f7"; ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI*2); ctx.stroke(); ctx.restore();
 
-    // Player Box Asset Rendering (With Jetpack visual indicators during Tier 2 Zone)
-    ctx.fillStyle = (currentLevel >= 16 && currentLevel <= 30) ? "#ec4899" : "#a855f7";
+    ctx.fillStyle = isFlyingZone ? "#ec4899" : "#a855f7";
     ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 6); ctx.fill();
-    ctx.fillStyle = "#020408"; ctx.fillRect(player.x + 4, player.y + 5, player.width - 8, 7);
+    ctx.fillStyle = "#010206"; ctx.fillRect(player.x + 4, player.y + 5, player.width - 8, 7);
 
-    // Interface Status logs
-    ctx.fillStyle = "#94a3b8"; ctx.font = "bold 12px monospace";
-    ctx.fillText(`DIMENSION SHIFT: ${currentLevel} / 50`, 35, 35);
-    ctx.fillText(`DEATH COUNTER: ${deaths}`, 250, 35);
-    if(currentLevel >= 16 && currentLevel <= 30) {
-        ctx.fillStyle = "#ec4899";
-        ctx.fillText("SYSTEM STATUS: ZERO-GRAVITY JETPACK MODE ON", 440, 35);
-    }
+    ctx.fillStyle = "#64748b"; ctx.font = "bold 11px monospace";
+    ctx.fillText(`MATRIX PHASE: ${currentLevel} / 50`, 35, 35);
+    ctx.fillText(`FAILURES: ${deaths}`, 220, 35);
 }
 
-function mainGameLoop() {
-    update();
-    render();
-    requestAnimationFrame(mainGameLoop);
-}
+function mainGameLoop() { update(); render(); requestAnimationFrame(mainGameLoop); }
 
-initPersistence();
-bindControls();
-mainGameLoop();
+initPersistence(); bindControls(); mainGameLoop();
 </script>
-
 </body>
 </html>
