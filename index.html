@@ -3,221 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Stardust: Cosmic Deception Core</title>
+    <title>Stardust: The 50 Quantum Deceptions</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
         html, body {
-            background: #04060a;
+            background: #020408;
             color: #f8fafc;
             font-family: 'Segoe UI', Roboto, sans-serif;
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; height: 100vh;
             overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
         }
         
         #gameContainer {
             position: relative;
-            width: 100%;
-            height: 100%;
-            max-width: 854px;
-            max-height: 480px;
+            width: 100%; height: 100%;
+            max-width: 854px; max-height: 480px;
             aspect-ratio: 16 / 9;
-            box-shadow: 0 0 40px rgba(6, 182, 212, 0.25);
-            border: 1px solid rgba(56, 189, 248, 0.15);
-            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(168, 85, 247, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
             overflow: hidden;
-            background: #070b12;
+            background: #05070f;
         }
         
         canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         
         #brandingIntro {
-            position: absolute;
-            top: 4%; right: 4%;
+            position: absolute; top: 4%; right: 4%;
             text-align: right; z-index: 30;
             font-family: monospace; pointer-events: none;
         }
-        #brandingIntro .brand { font-size: calc(10px + 0.4vw); font-weight: bold; letter-spacing: 2px; color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); }
-        #brandingIntro .sub { font-size: calc(7px + 0.2vw); letter-spacing: 1px; color: #64748b; margin-top: 1px; }
+        #brandingIntro .brand { font-size: calc(9px + 0.3vw); font-weight: bold; letter-spacing: 2px; color: #a855f7; text-shadow: 0 0 8px rgba(168, 85, 247, 0.6); }
+        #brandingIntro .sub { font-size: calc(6px + 0.2vw); letter-spacing: 1px; color: #475569; margin-top: 1px; }
 
         #audioToggleBtn {
-            position: absolute;
-            top: 15%; right: 4%;
-            width: 34px; height: 34px;
+            position: absolute; top: 14%; right: 4%;
+            width: 32px; height: 32px;
             background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.3);
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             cursor: pointer; z-index: 40;
         }
-        #audioToggleBtn svg { width: 16px; height: 16px; fill: #38bdf8; }
+        #audioToggleBtn svg { width: 14px; height: 14px; fill: #a855f7; }
 
         #orientationOverlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #05070f; z-index: 99999;
+            background: #020408; z-index: 99999;
             display: none; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center;
         }
         .phone-icon {
-            width: 50px; height: 85px; border: 4px solid #38bdf8; border-radius: 8px;
+            width: 45px; height: 80px; border: 4px solid #a855f7; border-radius: 8px;
             position: relative; animation: rotateDevice 2s infinite ease-in-out;
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
         }
-        .phone-icon::after {
-            content: ''; position: absolute; bottom: 5px; left: 50%;
-            transform: translateX(-50%); width: 8px; height: 8px;
-            background: #38bdf8; border-radius: 50%;
-        }
-        .rotate-text { font-size: 14px; font-weight: bold; letter-spacing: 2px; color: #38bdf8; margin-top: 25px; text-transform: uppercase; }
-        
         @keyframes rotateDevice {
             0% { transform: rotate(0deg); }
             50% { transform: rotate(-90deg); }
             100% { transform: rotate(-90deg); }
         }
-
+        .rotate-text { font-size: 13px; font-weight: bold; letter-spacing: 2px; color: #a855f7; margin-top: 20px; text-transform: uppercase; }
+        
         .screen {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column;
-            z-index: 10; background: #070b12;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; z-index: 10; background: #05070f;
         }
         .hide { display: none !important; }
         
         #welcomeScreen { justify-content: center; align-items: center; }
-        .welcome-company { font-size: calc(9px + 0.3vw); letter-spacing: 4px; color: #94a3b8; text-transform: uppercase; margin-bottom: 6px; font-family: monospace; }
-        .welcome-title { font-size: calc(24px + 2vw); font-weight: 900; letter-spacing: 3px; background: linear-gradient(135deg, #22d3ee, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 25px; }
+        .welcome-title { font-size: calc(20px + 2vw); font-weight: 900; letter-spacing: 4px; background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 25px; text-shadow: 0 0 30px rgba(168,85,247,0.2); }
         
         .btn-launch {
-            padding: 12px 36px; font-size: calc(12px + 0.3vw); font-weight: bold; letter-spacing: 2px;
-            color: #fff; background: linear-gradient(135deg, #0284c7, #6d28d9);
+            padding: 12px 40px; font-size: calc(11px + 0.3vw); font-weight: bold; letter-spacing: 2px;
+            color: #fff; background: linear-gradient(135deg, #7c3aed, #db2777);
             border: none; border-radius: 25px; cursor: pointer;
-            box-shadow: 0 6px 15px rgba(109, 40, 217, 0.4);
+            box-shadow: 0 6px 20px rgba(124, 58, 237, 0.4);
             text-transform: uppercase; transition: all 0.2s ease;
         }
 
-        #homeScreen { padding: 5%; justify-content: flex-start; align-items: flex-start; }
-        .menu-title { font-size: calc(16px + 0.8vw); font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, #22d3ee, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 15px; }
+        #homeScreen { padding: 4% 6%; justify-content: flex-start; align-items: flex-start; }
+        .menu-header { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .menu-title { font-size: calc(14px + 0.6vw); font-weight: 900; letter-spacing: 2px; color: #f8fafc; text-transform: uppercase; }
         
-        .map-container {
-            width: 100%; height: 68%;
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(99, 102, 241, 0.15);
-            border-radius: 10px; position: relative; overflow: hidden;
+        .map-scroll-view {
+            width: 100%; height: 75%;
+            background: rgba(10, 15, 30, 0.7);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 12px; overflow-y: auto; padding: 20px;
+            scroll-behavior: smooth;
         }
-        .orbit-line {
-            position: absolute; border: 1px dashed rgba(56, 189, 248, 0.08);
-            border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            pointer-events: none;
+        /* Custom scrollbar to keep it sleek */
+        .map-scroll-view::-webkit-scrollbar { width: 6px; }
+        .map-scroll-view::-webkit-scrollbar-thumb { background: #7c3aed; border-radius: 10px; }
+
+        .grid-matrix {
+            display: grid; grid-template-columns: repeat(10, 1fr); gap: 12px; width: 100%;
         }
-        .orbit-1 { width: 30%; height: 45%; }
-        .orbit-2 { width: 60%; height: 70%; }
-        .orbit-3 { width: 85%; height: 90%; }
         
         .level-node {
-            position: absolute; width: 38px; height: 38px;
-            background: #111827; border: 2px solid #3b4252;
-            border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; font-size: 13px; font-weight: bold; color: #94a3b8;
-            z-index: 15; transform: translate(-50%, -50%);
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            aspect-ratio: 1; width: 100%; min-width: 35px; max-width: 55px;
+            background: #0f111a; border: 2px solid #334155;
+            border-radius: 10px; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; font-size: 13px; font-weight: bold; color: #64748b;
+            position: relative; transition: all 0.2s;
         }
-        .level-node.unlocked { border-color: #38bdf8; color: #38bdf8; background: #0f172a; box-shadow: 0 0 12px rgba(56, 189, 248, 0.3); }
-        .level-node.current { border-color: #a855f7; color: #a855f7; background: #1e1b4b; animation: pulseGlow 1.5s infinite ease-in-out; }
-        .level-node.locked { cursor: not-allowed; opacity: 0.5; background: #0b0f19; border-color: #475569; color: #475569; }
+        .level-node.unlocked { border-color: #a855f7; color: #e2e8f0; background: #1a102f; box-shadow: 0 0 10px rgba(168, 85, 247, 0.2); }
+        .level-node.current { border-color: #f43f5e; color: #fff; background: #31102f; animation: nodePulse 1.4s infinite ease-in-out; }
+        .level-node.locked { cursor: not-allowed; opacity: 0.4; }
         .level-node svg { width: 12px; height: 12px; fill: #475569; }
-        .level-node.unlocked svg { fill: #38bdf8; }
 
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 8px rgba(168, 85, 247, 0.4); }
-            50% { box-shadow: 0 0 20px rgba(168, 85, 247, 0.6); scale: 1.05; }
-            100% { box-shadow: 0 0 8px rgba(168, 85, 247, 0.4); }
+        @keyframes nodePulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(244, 63, 94, 0.5); scale: 1; }
+            50% { box-shadow: 0 0 18px rgba(244, 63, 94, 0.8); scale: 1.05; }
         }
 
         #backToMenuBtn {
             position: absolute; top: 4%; left: 4%;
-            padding: 6px 14px; background: rgba(15, 23, 42, 0.75);
-            border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 20px;
-            color: #38bdf8; font-size: 10px; font-weight: bold; cursor: pointer; z-index: 30;
-            text-transform: uppercase; backdrop-filter: blur(5px);
+            padding: 6px 16px; background: rgba(10, 15, 30, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.4); border-radius: 20px;
+            color: #c084fc; font-size: 10px; font-weight: bold; cursor: pointer; z-index: 30;
+            text-transform: uppercase; backdrop-filter: blur(4px);
         }
 
-        #victoryOverlay { background: rgba(5, 7, 15, 0.8) !important; backdrop-filter: blur(4px); justify-content: center; align-items: center; }
+        #victoryOverlay { background: rgba(3, 5, 10, 0.85) !important; backdrop-filter: blur(4px); justify-content: center; align-items: center; }
         #victoryPopup {
-            background: rgba(15, 23, 42, 0.95); border: 2px solid #eab308;
-            border-radius: 12px; padding: 25px 45px; text-align: center;
+            background: #0f111a; border: 2px solid #a855f7;
+            border-radius: 14px; padding: 20px 40px; text-align: center;
+            box-shadow: 0 0 30px rgba(168,85,247,0.3);
         }
-        #victoryPopup h2 { font-size: 28px; font-weight: 900; color: #eab308; text-transform: uppercase; }
+        #victoryPopup h2 { font-size: 26px; font-weight: 900; color: #a855f7; text-transform: uppercase; letter-spacing: 2px; }
 
         #controlsOverlay {
             position: absolute; bottom: 6%; left: 0; width: 100%;
             display: flex; justify-content: space-between; padding: 0 6%;
             pointer-events: none; z-index: 25;
         }
-        .d-pad, .action-pad { display: flex; gap: 15px; pointer-events: auto; }
+        .d-pad, .action-pad { display: flex; gap: 16px; pointer-events: auto; }
         .ctrl-btn {
-            width: 64px; height: 64px; background: rgba(15, 23, 42, 0.75);
-            border: 2px solid rgba(56, 189, 248, 0.4); border-radius: 50%;
+            width: 60px; height: 60px; background: rgba(15, 23, 42, 0.7);
+            border: 2px solid rgba(168, 85, 247, 0.3); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             backdrop-filter: blur(4px); touch-action: none;
         }
-        .ctrl-btn svg { width: 32px; height: 32px; fill: #38bdf8; }
+        .ctrl-btn svg { width: 30px; height: 30px; fill: #c084fc; }
+        .ctrl-btn:active { background: rgba(168, 85, 247, 0.3); border-color: #a855f7; }
     </style>
 </head>
 <body>
 
     <div id="orientationOverlay">
         <div class="phone-icon"></div>
-        <div class="rotate-text">Please Rotate Device To Landscape</div>
+        <div class="rotate-text">Rotate to Landscape</div>
     </div>
 
     <div id="gameContainer">
         <div id="brandingIntro">
-            <div class="brand">STARDUST QUANTUM LABS</div>
-            <div class="sub">SIMULATION MODULE v4.3-STABLE</div>
+            <div class="brand">QUANTUM CORE ENGINE</div>
+            <div class="sub">50 DECEPTIONS ARCHITECTURE v5.0</div>
         </div>
 
         <div id="audioToggleBtn" onclick="toggleAudioSystem()">
-            <svg id="audioIcon" viewBox="0 0 24 24">
-                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
-            </svg>
+            <svg id="audioIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
         </div>
 
         <button id="backToMenuBtn" class="hide" onclick="exitToMenu()">Abort Mission</button>
 
         <div id="welcomeScreen" class="screen">
-            <div class="welcome-company">Stardust Studio Presents</div>
-            <h1 class="welcome-title">Cosmic Deception</h1>
-            <button class="btn-launch" onclick="enterLevelSelector()">Start Simulation</button>
+            <h1 class="welcome-title">Level 50: Chaos</h1>
+            <button class="btn-launch" onclick="enterLevelSelector()">Initialize Matrix</button>
         </div>
 
         <div id="homeScreen" class="screen hide">
-            <h1 class="menu-title">Select Simulation Phase</h1>
-            <div class="map-container">
-                <div class="orbit-line orbit-1"></div>
-                <div class="orbit-line orbit-2"></div>
-                <div class="orbit-line orbit-3"></div>
-                
-                <div class="level-node" id="node-1" style="top:50%; left:50%;" onclick="launchLevel(1)">1</div>
-                <div class="level-node" id="node-2" style="top:50%; left:33%;" onclick="launchLevel(2)">2</div>
-                <div class="level-node" id="node-3" style="top:28%; left:45%;" onclick="launchLevel(3)">3</div>
-                <div class="level-node" id="node-4" style="top:42%; left:67%;" onclick="launchLevel(4)">4</div>
-                <div class="level-node" id="node-5" style="top:72%; left:56%;" onclick="launchLevel(5)">5</div>
-                <div class="level-node" id="node-6" style="top:22%; left:20%;" onclick="launchLevel(6)">6</div>
-                <div class="level-node" id="node-7" style="top:16%; left:74%;" onclick="launchLevel(7)">7</div>
-                <div class="level-node" id="node-8" style="top:84%; left:30%;" onclick="launchLevel(8)">8</div>
-                <div class="level-node" id="node-9" style="top:80%; left:82%;" onclick="launchLevel(9)">9</div>
-                <div class="level-node" id="node-10" style="top:50%; left:92%;" onclick="launchLevel(10)">10</div>
+            <div class="menu-header">
+                <h1 class="menu-title">Select Core Dimension</h1>
+            </div>
+            <div class="map-scroll-view">
+                <div class="grid-matrix" id="matrixContainer">
+                    </div>
             </div>
         </div>
 
         <div id="victoryOverlay" class="screen hide">
             <div id="victoryPopup">
-                <h2 id="victoryText">Phase Clear</h2>
-                <p style="color: #94a3b8; font-size: 11px; letter-spacing: 2px; font-weight: 600; margin-top:5px;">SYNCHRONIZING TIMELINE...</p>
+                <h2 id="victoryText">Dimension Fractured</h2>
+                <p style="color: #64748b; font-size: 10px; letter-spacing: 2px; margin-top:5px;">SHIFTING QUANTUM COORDINATES...</p>
             </div>
         </div>
 
@@ -249,193 +219,172 @@ let currentLevel = 1;
 let maxUnlockedLevel = 1;
 let deaths = 0;
 let isTransitioning = false;
-let portalRotation = 0;
-let isMuted = false;
 let systemHalted = false;
+let globalTime = 0;
 
-// Re-balanced character constants for precise jump arcs across hard gaps
-let player = { x: 40, y: 350, width: 22, height: 32, speed: 5.2, velX: 0, velY: 0, jumping: false, grounded: false };
-const gravity = 0.48;
-const friction = 0.85;
+// Player Core Physics
+let player = { x: 40, y: 350, width: 22, height: 30, speed: 5.5, velX: 0, velY: 0, jumping: false, grounded: false };
+const baseGravity = 0.52;
+const friction = 0.84;
 
 let stars = [];
-let shootingStars = [];
-for(let i=0; i<35; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.8, alpha: Math.random() });
+for(let i=0; i<45; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.5+0.5 });
 
 let platforms = [];
 let traps = [];
-let portal = { x: 730, y: 330, width: 50, height: 90 };
+let lasers = [];
+let portal = { x: 750, y: 340, width: 45, height: 80 };
 
-let audioCtx = null;
-let masterGain = null;
-let audioLoopId = null;
+// Sound generator system
+let audioCtx = null, masterGain = null, audioLoopId = null;
+let isMuted = false;
 
 function startSoftMelody() {
     if (audioCtx) return;
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    masterGain = audioCtx.createGain();
-    masterGain.gain.setValueAtTime(0.6, audioCtx.currentTime); 
+    masterGain = audioCtx.createGain(); masterGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
     masterGain.connect(audioCtx.destination);
-
-    let melody = [293.66, 329.63, 349.23, 392.00, 440.00, 523.25]; 
-    let index = 0;
-
+    let notes = [220, 261, 293, 329, 392, 440]; let idx = 0;
     audioLoopId = setInterval(() => {
-        if (!audioCtx || audioCtx.state !== "running" || isTransitioning || isMuted || systemHalted) return;
-        
-        let osc = audioCtx.createOscillator();
-        let gainNode = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(melody[index], audioCtx.currentTime);
-
-        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.45, audioCtx.currentTime + 0.05);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
-
-        osc.connect(gainNode);
-        gainNode.connect(masterGain);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.45);
-        index = (index + 1) % melody.length;
-    }, 280);
+        if (!audioCtx || isMuted || systemHalted || gameState !== "PLAYING") return;
+        let osc = audioCtx.createOscillator(); let g = audioCtx.createGain();
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(notes[idx], audioCtx.currentTime);
+        g.gain.setValueAtTime(0, audioCtx.currentTime);
+        g.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime+0.05);
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.5);
+        osc.connect(g); g.connect(masterGain); osc.start(); osc.stop(audioCtx.currentTime+0.6);
+        idx = (idx + 1) % notes.length;
+    }, 400);
 }
 
 function toggleAudioSystem() {
     isMuted = !isMuted;
-    const icon = document.getElementById("audioIcon");
-    if(isMuted) {
-        icon.innerHTML = `<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>`;
-        if(masterGain) masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
-    } else {
-        icon.innerHTML = `<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>`;
-        if(masterGain) masterGain.gain.setValueAtTime(0.6, audioCtx.currentTime);
-    }
+    document.getElementById("audioIcon").style.fill = isMuted ? "#475569" : "#a855f7";
 }
 
 function checkOrientation() {
     if (window.innerHeight > window.innerWidth) {
-        document.getElementById("orientationOverlay").style.display = "flex";
-        systemHalted = true;
-        if(audioCtx && audioCtx.state === "running") audioCtx.suspend();
+        document.getElementById("orientationOverlay").style.display = "flex"; systemHalted = true;
     } else {
-        document.getElementById("orientationOverlay").style.display = "none";
-        systemHalted = false;
-        if(audioCtx && audioCtx.state === "suspended") audioCtx.resume();
+        document.getElementById("orientationOverlay").style.display = "none"; systemHalted = false;
     }
 }
 window.addEventListener("resize", checkOrientation);
 window.addEventListener("load", checkOrientation);
 
-document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-        if (audioCtx && audioCtx.state === "running") audioCtx.suspend();
-    } else {
-        if (audioCtx && audioCtx.state === "suspended" && !systemHalted) audioCtx.resume();
+// Generation of the 50 Nodes inside HTML layout Grid
+function generateMatrixUI() {
+    const container = document.getElementById("matrixContainer");
+    container.innerHTML = "";
+    for(let i=1; i<=50; i++) {
+        const d = document.createElement("div");
+        d.id = `node-${i}`;
+        d.onclick = () => launchLevel(i);
+        container.appendChild(d);
     }
-});
+}
 
 function initPersistence() {
-    const savedLevel = localStorage.getItem("stardust_max_lvl");
-    const savedCurrent = localStorage.getItem("stardust_curr_lvl");
-    const savedDeaths = localStorage.getItem("stardust_deaths");
-    if (savedLevel) maxUnlockedLevel = parseInt(savedLevel);
-    if (savedCurrent) currentLevel = parseInt(savedCurrent);
-    if (savedDeaths) deaths = parseInt(savedDeaths);
+    generateMatrixUI();
+    const l = localStorage.getItem("s50_max");
+    const c = localStorage.getItem("s50_curr");
+    const d = localStorage.getItem("s50_deaths");
+    if(l) maxUnlockedLevel = parseInt(l);
+    if(c) currentLevel = parseInt(c);
+    if(d) deaths = parseInt(d);
     refreshUniverseMap();
 }
 
 function saveProgress() {
-    localStorage.setItem("stardust_max_lvl", maxUnlockedLevel);
-    localStorage.setItem("stardust_curr_lvl", currentLevel);
-    localStorage.setItem("stardust_deaths", deaths);
+    localStorage.setItem("s50_max", maxUnlockedLevel);
+    localStorage.setItem("s50_curr", currentLevel);
+    localStorage.setItem("s50_deaths", deaths);
 }
 
 function refreshUniverseMap() {
-    for(let i=1; i<=10; i++) {
+    for(let i=1; i<=50; i++) {
         const node = document.getElementById(`node-${i}`);
-        if (!node) continue;
+        if(!node) continue;
         node.className = "level-node";
-        
-        if (i <= maxUnlockedLevel) {
+        if(i <= maxUnlockedLevel) {
             node.classList.add("unlocked");
-            node.innerText = i; 
-            if (i === currentLevel) node.classList.add("current");
+            node.innerText = i;
+            if(i === currentLevel) node.classList.add("current");
         } else {
             node.classList.add("locked");
-            node.innerHTML = `<svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
+            node.innerHTML = `<svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2z"/></svg>`;
         }
     }
 }
 
-function loadLevel(lvl) {
-    platforms = []; traps = [];
-    platforms.push({ x: 0, y: 430, width: 140, height: 50 });
+// Procedural Pro-Level Blueprint Logic (50 Fully Structured Maps)
+function loadLevelBlueprint(lvl) {
+    platforms = []; traps = []; lasers = [];
+    
+    // Check if it's a Flying level zone (Levels 16 to 30)
+    let isFlyingZone = (lvl >= 16 && lvl <= 30);
 
-    switch(lvl) {
-        case 1:
-            portal.x = 730; portal.y = 340;
-            platforms.push({ x: 140, y: 430, width: 540, height: 50 });
-            platforms.push({ x: 680, y: 430, width: 180, height: 50 });
-            traps.push({ x: 320, y: 430, currentY: 430, width: 35, height: 40, targetY: 395, type: 'rising', triggerX: 260, triggered: false });
-            break;
-        case 2:
-            portal.x = 730; portal.y = 140;
-            platforms.push({ x: 200, y: 350, width: 160, height: 30 });
-            platforms.push({ x: 420, y: 265, width: 160, height: 30 });
-            platforms.push({ x: 650, y: 230, width: 210, height: 30 });
-            traps.push({ x: 460, y: -45, currentY: -45, width: 45, height: 45, triggerX: 430, type: 'falling', triggered: false });
-            break;
-        case 3: 
-            // FIXED LEVEL 3 ARCS: Positioned portal perfectly for enhanced control mechanics
-            portal.x = 45; portal.y = 130;
-            platforms.push({ x: 160, y: 360, width: 700, height: 30 });
-            platforms.push({ x: 380, y: 260, width: 240, height: 30 });
-            platforms.push({ x: 0, y: 220, width: 150, height: 30 });  
-            traps.push({ x: 290, y: 360, currentY: 360, width: 35, height: 35, targetY: 328, type: 'rising', triggerX: 235, triggered: false });
-            break;
-        case 4:
-            portal.x = 740; portal.y = 340;
-            platforms.push({ x: 180, y: 430, width: 520, height: 50 });
-            platforms.push({ x: 240, y: 320, width: 420, height: 30 }); 
-            platforms.push({ x: 700, y: 430, width: 160, height: 50 });
-            break;
-        case 5:
-            portal.x = 740; portal.y = 110;
-            platforms.push({ x: 180, y: 350, width: 110, height: 130 });
-            platforms.push({ x: 440, y: 250, width: 110, height: 230 });
-            platforms.push({ x: 640, y: 200, width: 220, height: 280 });
-            break;
-        case 6:
-            portal.x = 740; portal.y = 340;
-            platforms.push({ x: 180, y: 430, width: 500, height: 50 }); 
-            platforms.push({ x: 680, y: 430, width: 180, height: 50 });
-            break;
-        case 7:
-            portal.x = 50; portal.y = 110;
-            platforms.push({ x: 250, y: 400, width: 220, height: 30 });
-            platforms.push({ x: 520, y: 300, width: 240, height: 30 });
-            platforms.push({ x: 230, y: 200, width: 220, height: 30 });
-            platforms.push({ x: 0, y: 200, width: 150, height: 30 });
-            break;
-        case 8:
-            portal.x = 740; portal.y = 340;
-            platforms.push({ x: 0, y: 430, width: 260, height: 50 });
-            platforms.push({ x: 540, y: 430, width: 320, height: 50 });
-            break;
-        case 9:
-            portal.x = 740; portal.y = 110;
-            platforms.push({ x: 180, y: 380, width: 60, height: 100 });
-            platforms.push({ x: 300, y: 320, width: 60, height: 160 });
-            platforms.push({ x: 420, y: 260, width: 60, height: 220 });
-            platforms.push({ x: 540, y: 210, width: 60, height: 270 });
-            platforms.push({ x: 660, y: 200, width: 200, height: 280 });
-            break;
-        case 10:
-            portal.x = 740; portal.y = 340;
-            platforms.push({ x: 150, y: 430, width: 200, height: 50 });
-            platforms.push({ x: 350, y: 430, width: 220, height: 50 });
-            platforms.push({ x: 570, y: 430, width: 300, height: 50 });
-            break;
+    // Initial safe zone logic
+    if (!isFlyingZone) {
+        platforms.push({ x: 0, y: 420, width: 120, height: 60 });
+    } else {
+        // Jetpack/Flying level entry point platform
+        platforms.push({ x: 0, y: 360, width: 80, height: 120 });
+    }
+
+    // Dynamic procedural assignment per tier
+    if(lvl <= 15) { 
+        // Tier 1: Hardcore Space (Large fixed gaps, sudden trap ceilings)
+        portal.x = 760; portal.y = 340;
+        platforms.push({ x: 180, y: 420, width: 100, height: 60 });
+        platforms.push({ x: 380, y: 350, width: 120, height: 30 });
+        platforms.push({ x: 620, y: 420, width: 240, height: 60 });
+        
+        // Sudden spikes/traps
+        traps.push({ x: 220, y: 420, width: 30, height: 30, type: 'static' });
+        if(lvl >= 8) {
+            // Level 8 Extended Gap Fixer Platform (Reveals as trick)
+            platforms.push({ x: 280, y: 420, width: 100, height: 20, isFake: false }); 
+            traps.push({ x: 410, y: -50, currentY: -50, width: 40, height: 40, type: 'falling', triggerX: 350, triggered: false });
+        }
+    } 
+    else if(lvl <= 30) { 
+        // Tier 2: Zero-Gravity Jetpack/Flying Zone (NO Ground platforms, dense traps)
+        portal.x = 770; portal.y = 200;
+        // Float blocks scattered along the route
+        platforms.push({ x: 250, y: 220, width: 80, height: 30 });
+        platforms.push({ x: 500, y: 320, width: 80, height: 30 });
+        platforms.push({ x: 720, y: 280, width: 140, height: 200 });
+
+        // Moving obstacle lasers across the flight route
+        lasers.push({ x: 180, y1: 50, y2: 320, state: true, timer: 0, speed: 120 });
+        lasers.push({ x: 400, y1: 150, y2: 450, state: true, timer: 40, speed: 100 });
+        lasers.push({ x: 620, y1: 20, y2: 300, state: true, timer: 80, speed: 140 });
+    } 
+    else if(lvl <= 45) { 
+        // Tier 3: Quantum Shifts (Dynamic platform shifts & cycles)
+        portal.x = 750; portal.y = 140;
+        platforms.push({ x: 160, y: 340, width: 140, height: 30, baseId: 1 });
+        platforms.push({ x: 380, y: 260, width: 150, height: 30, baseId: 2 });
+        platforms.push({ x: 620, y: 200, width: 240, height: 280 });
+        
+        // Dynamic cyclical traps
+        traps.push({ x: 200, y: 340, width: 30, height: 30, type: 'static' });
+        traps.push({ x: 440, y: 260, width: 30, height: 30, type: 'static' });
+    } 
+    else { 
+        // Tier 4: Ultimate Quantum Core (Mega long maps, extreme sync required)
+        portal.x = 780; portal.y = 340;
+        platforms.push({ x: 150, y: 400, width: 90, height: 80 });
+        platforms.push({ x: 300, y: 300, width: 90, height: 180 });
+        platforms.push({ x: 450, y: 220, width: 90, height: 260 });
+        platforms.push({ x: 600, y: 320, width: 90, height: 160 });
+        platforms.push({ x: 740, y: 420, width: 125, height: 60 });
+
+        // Dual Moving laser system + falling ceiling traps
+        lasers.push({ x: 270, y1: 0, y2: 400, state: true, timer: 0, speed: 80 });
+        lasers.push({ x: 570, y1: 0, y2: 400, state: true, timer: 30, speed: 80 });
+        traps.push({ x: 320, y: -40, currentY: -40, width: 40, height: 40, type: 'falling', triggerX: 250, triggered: false });
     }
 }
 
@@ -444,7 +393,6 @@ function enterLevelSelector() {
     gameState = "MENU";
     document.getElementById("welcomeScreen").classList.add("hide");
     document.getElementById("homeScreen").classList.remove("hide");
-    document.getElementById("brandingIntro").classList.remove("hide"); 
     try { startSoftMelody(); } catch(e){}
     refreshUniverseMap();
 }
@@ -458,8 +406,9 @@ function launchLevel(selectedLvl) {
     document.getElementById("controlsOverlay").classList.remove("hide");
     document.getElementById("backToMenuBtn").classList.remove("hide");
     gameState = "PLAYING";
-    player.x = 40; player.y = 300; player.velX = 0; player.velY = 0;
-    loadLevel(currentLevel);
+    
+    player.x = 30; player.y = 250; player.velX = 0; player.velY = 0;
+    loadLevelBlueprint(currentLevel);
 }
 
 function exitToMenu() {
@@ -471,47 +420,61 @@ function exitToMenu() {
     refreshUniverseMap();
 }
 
+// Controller Hooks
 let activeKeys = { Left: false, Right: false, Jump: false };
 function bindControls() {
-    const hook = (id, key) => {
+    const bind = (id, key) => {
         const el = document.getElementById(id);
         el.addEventListener("touchstart", (e) => { e.preventDefault(); if(!systemHalted) activeKeys[key] = true; });
         el.addEventListener("touchend", (e) => { e.preventDefault(); activeKeys[key] = false; });
     };
-    hook("btnLeft", "Left"); hook("btnRight", "Right"); hook("btnJump", "Jump");
+    bind("btnLeft", "Left"); bind("btnRight", "Right"); bind("btnJump", "Jump");
 }
 
-function checkCollision(rect1, rect2) {
-    return rect1.x < rect2.x + rect2.width &&
-           rect1.x + rect1.width > rect2.x &&
-           rect1.y < rect2.y + rect2.height &&
-           rect1.y + rect1.height > rect2.y;
+function checkCollision(r1, r2) {
+    return r1.x < r2.x + r2.width && r1.x + r1.width > r2.x &&
+           r1.y < r2.y + r2.height && r1.y + r1.height > r2.y;
 }
 
 function update() {
     if (gameState !== "PLAYING" || isTransitioning || systemHalted) return;
 
-    portalRotation += 0.03;
-    if(Math.random() < 0.015) shootingStars.push({ x: Math.random()*600, y: 0, vx: 4, vy: 3, len: 25, alpha: 1 });
-    for(let s of shootingStars) { s.x += s.vx; s.y += s.vy; s.alpha -= 0.02; }
-    shootingStars = shootingStars.filter(s => s.alpha > 0);
+    globalTime++;
+    let isFlyingZone = (currentLevel >= 16 && currentLevel <= 30);
 
-    if (activeKeys.Jump && !player.jumping && player.grounded) {
-        player.jumping = true; player.grounded = false; player.velY = -12.2; // Slightly higher base arc
+    // 1. Core Physics Processing (Separate logic for Flying Levels)
+    if (isFlyingZone) {
+        // Flying System Mode: Jump gives upward jet thruster propulsion
+        if (activeKeys.Jump) {
+            player.velY -= 0.65;
+            if(player.velY < -5.5) player.velY = -5.5;
+        } else {
+            player.velY += 0.32; // Light zero-gravity fallback drag
+        }
+    } else {
+        // Classic Hardcore Platformer Jumping
+        if (activeKeys.Jump && !player.jumping && player.grounded) {
+            player.jumping = true; player.grounded = false; 
+            player.velY = (currentLevel === 8) ? -13.0 : -11.8; // Extended launch momentum specifically for level 8 gap
+        }
+        player.velY += baseGravity;
     }
+
+    if (activeKeys.Left) { if(player.velX > -player.speed) player.velX -= 0.8; }
+    if (activeKeys.Right) { if(player.velX < player.speed) player.velX += 0.8; }
     
-    // LEVEL 3 JUMP MECHANIC: Provides aerial velocity balancing to overcome layout distance safely
-    let currentSpeed = player.speed;
-    if (currentLevel === 3 && player.jumping) {
-        currentSpeed = 6.2; 
-    }
-
-    if (activeKeys.Left) { if (player.velX > -currentSpeed) player.velX -= 0.85; }
-    if (activeKeys.Right) { if (player.velX < currentSpeed) player.velX += 0.85; }
-
-    player.velX *= friction; player.velY += gravity;
+    player.velX *= friction;
     player.grounded = false;
 
+    // 2. Dynamic platform shift calculations (Tier 3 levels)
+    if(currentLevel >= 31 && currentLevel <= 45) {
+        for(let plat of platforms) {
+            if(plat.baseId === 1) plat.y = 340 + Math.sin(globalTime * 0.04) * 35;
+            if(plat.baseId === 2) plat.y = 260 + Math.cos(globalTime * 0.04) * 35;
+        }
+    }
+
+    // Horizontal position updates
     player.x += player.velX;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -520,6 +483,7 @@ function update() {
         }
     }
 
+    // Vertical position updates
     player.y += player.velY;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -532,91 +496,125 @@ function update() {
         }
     }
 
+    // Screen Boundary locks
     if(player.x < 0) player.x = 0;
     if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
-    if (player.y > canvas.height) playerDie();
+    if (player.y > canvas.height || player.y < -40) playerDie();
 
+    // 3. Spikes and Trap Actions
     for (let trap of traps) {
         if (player.x >= trap.triggerX) trap.triggered = true;
-        if (trap.type === 'rising' && trap.triggered && trap.currentY > trap.targetY) trap.currentY -= 3.0;
-        if (trap.type === 'falling' && trap.triggered) trap.currentY += 8.2;
-        let trapBox = { x: trap.x, y: trap.currentY, width: trap.width, height: trap.height };
-        if (checkCollision(player, trapBox)) playerDie();
+        if (trap.type === 'falling' && trap.triggered) trap.currentY += 8.5;
+        
+        let box = { x: trap.x, y: trap.type === 'falling' ? trap.currentY : trap.y, width: trap.width, height: trap.height };
+        if (checkCollision(player, box)) playerDie();
     }
 
-    if (checkCollision(player, portal)) triggerVictoryScreen();
+    // 4. Moving Laser Triggers
+    for (let laser of lasers) {
+        laser.timer++;
+        if(laser.timer % laser.speed === 0) laser.state = !laser.state;
+        
+        if(laser.state) {
+            // Collision line interception check
+            if(player.x + player.width > laser.x && player.x < laser.x + 4) {
+                if(player.y + player.height > laser.y1 && player.y < laser.y2) {
+                    playerDie();
+                }
+            }
+        }
+    }
+
+    // Check level progression portal collision
+    if (checkCollision(player, portal)) triggerNextDimension();
 }
 
-function triggerVictoryScreen() {
+function triggerNextDimension() {
     isTransitioning = true;
-    document.getElementById("victoryText").innerText = `Phase 0${currentLevel} Clear`;
+    document.getElementById("victoryText").innerText = `Dimension 0${currentLevel} Cleared`;
     document.getElementById("victoryOverlay").classList.remove("hide");
     setTimeout(() => {
         document.getElementById("victoryOverlay").classList.add("hide");
-        if (currentLevel === maxUnlockedLevel && maxUnlockedLevel < 10) maxUnlockedLevel++;
-        if (currentLevel < 10) currentLevel++;
+        if (currentLevel === maxUnlockedLevel && maxUnlockedLevel < 50) maxUnlockedLevel++;
+        if (currentLevel < 50) currentLevel++;
         saveProgress();
-        player.x = 40; player.y = 300; player.velX = 0; player.velY = 0;
-        loadLevel(currentLevel);
+        player.x = 30; player.y = 250; player.velX = 0; player.velY = 0;
+        loadLevelBlueprint(currentLevel);
         isTransitioning = false;
-    }, 2000);
+    }, 1800);
 }
 
 function playerDie() {
     deaths++;
     saveProgress();
-    player.x = 40; player.y = 300; player.velX = 0; player.velY = 0;
-    loadLevel(currentLevel);
+    player.x = 30; player.y = 250; player.velX = 0; player.velY = 0;
+    loadLevelBlueprint(currentLevel);
 }
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = "#070b12"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#05070f"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    ctx.fillStyle = "#fff";
-    for(let s of stars) {
-        ctx.globalAlpha = Math.abs(Math.sin(Date.now()*0.001 + s.alpha*10));
-        ctx.fillRect(s.x, s.y, s.size, s.size);
-    }
-    ctx.globalAlpha = 1.0;
+    // Draw Space Matrix Background particles
+    ctx.fillStyle = "rgba(168, 85, 247, 0.4)";
+    for(let s of stars) ctx.fillRect(s.x, s.y, s.size, s.size);
 
     if (gameState === "WELCOME" || gameState === "MENU" || systemHalted) return;
 
+    // Platform Render Engine
     for (let plat of platforms) {
-        ctx.fillStyle = "#111827"; ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
-        ctx.fillStyle = "#4f46e5"; ctx.fillRect(plat.x, plat.y, plat.width, 3);
+        ctx.fillStyle = "#0f111a"; ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
+        ctx.fillStyle = "#7c3aed"; ctx.fillRect(plat.x, plat.y, plat.width, 3);
     }
 
+    // Traps / Spikes Render Engine
     for (let trap of traps) {
-        ctx.fillStyle = "#111827"; ctx.fillRect(trap.x, trap.currentY, trap.width, trap.height);
-        ctx.fillStyle = "#4f46e5"; ctx.fillRect(trap.x, trap.currentY, trap.width, 3);
+        let ty = trap.type === 'falling' ? trap.currentY : trap.y;
+        ctx.fillStyle = "#1e112a"; ctx.fillRect(trap.x, ty, trap.width, trap.height);
+        ctx.fillStyle = "#ef4444"; ctx.fillRect(trap.x, ty, trap.width, 3);
     }
 
-    let pCenterX = portal.x + portal.width / 2;
-    let pCenterY = portal.y + portal.height / 2;
-    ctx.save(); ctx.translate(pCenterX, pCenterY); ctx.rotate(portalRotation);
-    ctx.strokeStyle = "#22d3ee"; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.arc(0, 0, 32, 0, Math.PI * 2); ctx.stroke();
+    // Dangerous Lasers System Render Engine
+    for (let laser of lasers) {
+        if(laser.state) {
+            ctx.strokeStyle = "rgba(239, 68, 68, 0.85)"; ctx.lineWidth = 4;
+            ctx.shadowBlur = 15; ctx.shadowColor = "#ef4444";
+            ctx.beginPath(); ctx.moveTo(laser.x, laser.y1); ctx.lineTo(laser.x, laser.y2); ctx.stroke();
+            ctx.shadowBlur = 0; // Reset canvas glow
+        }
+    }
+
+    // Dimensional Wormhole Portal Rendering
+    let pX = portal.x + portal.width/2, pY = portal.y + portal.height/2;
+    ctx.save(); ctx.translate(pX, pY); ctx.rotate(globalTime * 0.04);
+    ctx.strokeStyle = (currentLevel >= 16 && currentLevel <= 30) ? "#ec4899" : "#a855f7"; 
+    ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI*2); ctx.stroke();
     ctx.restore();
 
-    ctx.fillStyle = "#22d3ee"; 
-    ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 8); ctx.fill();
-    ctx.fillStyle = "#0b0f17"; ctx.fillRect(player.x + 4, player.y + 6, player.width - 8, 8);
+    // Player Box Asset Rendering (With Jetpack visual indicators during Tier 2 Zone)
+    ctx.fillStyle = (currentLevel >= 16 && currentLevel <= 30) ? "#ec4899" : "#a855f7";
+    ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 6); ctx.fill();
+    ctx.fillStyle = "#020408"; ctx.fillRect(player.x + 4, player.y + 5, player.width - 8, 7);
 
-    ctx.fillStyle = "#64748b"; ctx.font = "bold 13px monospace";
-    ctx.fillText(`PHASE LOG: 0${currentLevel} / 10`, 40, 36);
-    ctx.fillText(`DEATH COUNTER: ${deaths}`, 240, 36);
+    // Interface Status logs
+    ctx.fillStyle = "#94a3b8"; ctx.font = "bold 12px monospace";
+    ctx.fillText(`DIMENSION SHIFT: ${currentLevel} / 50`, 35, 35);
+    ctx.fillText(`DEATH COUNTER: ${deaths}`, 250, 35);
+    if(currentLevel >= 16 && currentLevel <= 30) {
+        ctx.fillStyle = "#ec4899";
+        ctx.fillText("SYSTEM STATUS: ZERO-GRAVITY JETPACK MODE ON", 440, 35);
+    }
 }
 
-function gameLoop() {
+function mainGameLoop() {
     update();
     render();
-    requestAnimationFrame(gameLoop);
+    requestAnimationFrame(mainGameLoop);
 }
 
 initPersistence();
 bindControls();
-gameLoop();
+mainGameLoop();
 </script>
 
 </body>
