@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Cosmic Chaos: 50 Deceptions</title>
+    <title>Cosmic Chaos: 100 Core Dimensions</title>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
         html, body {
@@ -40,6 +40,11 @@
             background: #05070f; z-index: 99999; display: none;
             flex-direction: column; justify-content: center; align-items: center;
         }
+        .phone-icon {
+            width: 45px; height: 80px; border: 4px solid #38bdf8; border-radius: 8px;
+            animation: rotateDevice 2s infinite ease-in-out;
+        }
+        @keyframes rotateDevice { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } }
         
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
@@ -70,33 +75,33 @@
         .menu-title { font-size: calc(14px + 0.6vw); font-weight: 900; letter-spacing: 2px; background: linear-gradient(135deg, #22d3ee, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 10px; }
         
         .map-container {
-            width: 100%; height: 75%; background: rgba(15, 23, 42, 0.4);
+            width: 100%; height: 78%; background: rgba(15, 23, 42, 0.4);
             border: 1px solid rgba(99, 102, 241, 0.15); border-radius: 10px;
             position: relative; overflow-y: auto; overflow-x: hidden; padding: 20px;
         }
         
         .orbit-line {
-            position: absolute; border: 1px dashed rgba(56, 189, 248, 0.08);
+            position: absolute; border: 1px dashed rgba(56, 189, 248, 0.05);
             border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            pointer-events: none; width: 85%; height: 200%;
+            pointer-events: none; width: 90%; height: 350%;
         }
         
-        .level-nodes-wrap { position: relative; width: 100%; height: 950px; }
+        .level-nodes-wrap { position: relative; width: 100%; height: 1950px; }
 
         .level-node {
-            position: absolute; width: 36px; height: 36px;
+            position: absolute; width: 34px; height: 34px;
             background: #111827; border: 2px solid #3b4252;
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; font-size: 11px; font-weight: bold; color: #94a3b8;
+            cursor: pointer; font-size: 10px; font-weight: bold; color: #94a3b8;
             transform: translate(-50%, -50%); z-index: 15;
         }
-        .level-node.unlocked { border-color: #38bdf8; color: #38bdf8; background: #0f172a; box-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+        .level-node.unlocked { border-color: #38bdf8; color: #38bdf8; background: #0f172a; box-shadow: 0 0 8px rgba(56, 189, 248, 0.2); }
         .level-node.current { border-color: #a855f7; color: #fff; background: #1e1b4b; animation: pulseGlow 1.4s infinite ease-in-out; }
-        .level-node.locked { cursor: not-allowed; opacity: 0.4; }
+        .level-node.locked { cursor: not-allowed; opacity: 0.3; }
 
         @keyframes pulseGlow {
             0%, 100% { box-shadow: 0 0 6px rgba(168, 85, 247, 0.4); scale: 1; }
-            50% { box-shadow: 0 0 16px rgba(168, 85, 247, 0.7); scale: 1.05; }
+            50% { box-shadow: 0 0 14px rgba(168, 85, 247, 0.7); scale: 1.05; }
         }
 
         #backToMenuBtn {
@@ -123,12 +128,11 @@
             touch-action: none;
         }
         .ctrl-btn svg { width: 32px; height: 32px; fill: #38bdf8; }
-        .ctrl-btn:active { background: rgba(56, 189, 248, 0.3); }
     </style>
 </head>
 <body>
 
-    <div id="orientationOverlay"></div>
+    <div id="orientationOverlay"><div class="phone-icon"></div></div>
 
     <div id="gameContainer">
         <div id="brandingIntro">
@@ -149,7 +153,7 @@
         </div>
 
         <div id="homeScreen" class="screen hide">
-            <h1 class="menu-title">Select Simulation Space</h1>
+            <h1 class="menu-title">Simulation Map (1-100)</h1>
             <div class="map-container">
                 <div class="orbit-line"></div>
                 <div class="level-nodes-wrap" id="nodesContainer"></div>
@@ -181,16 +185,28 @@ let gameState = "WELCOME";
 let currentLevel = 1; let maxUnlockedLevel = 1; let deaths = 0;
 let isTransitioning = false; let systemHalted = false; let globalTime = 0;
 
-// RE-ENGINEERED PHYSICS ARCHITECTURE
-let player = { x: 50, y: 300, width: 22, height: 32, speed: 5.5, velX: 0, velY: 0, jumping: false, grounded: false };
-const baseGravity = 0.48; const friction = 0.85;
+// BOOSTED STABLE PHYSICS VALUES FOR ABSOLUTE REACH
+let player = { x: 50, y: 300, width: 22, height: 32, speed: 5.8, velX: 0, velY: 0, jumping: false, grounded: false };
+const baseGravity = 0.46; const friction = 0.85;
 
-let stars = []; for(let i=0; i<35; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.6 });
+let stars = []; for(let i=0; i<40; i++) stars.push({ x: Math.random()*854, y: Math.random()*480, size: Math.random()*1.5 });
 let platforms = []; let traps = []; let lasers = [];
 let portal = { x: 740, y: 330, width: 48, height: 85 };
 
 let audioCtx = null, masterGain = null, audioLoopId = null;
 let isMuted = false;
+
+function checkOrientation() {
+    if (window.innerHeight > window.innerWidth) { 
+        document.getElementById("orientationOverlay").style.display = "flex"; 
+        systemHalted = true; 
+    } else { 
+        document.getElementById("orientationOverlay").style.display = "none"; 
+        systemHalted = false; 
+    }
+}
+window.addEventListener("resize", checkOrientation);
+window.addEventListener("load", checkOrientation);
 
 function startSoftMelody() {
     if (audioCtx) return;
@@ -217,12 +233,12 @@ function toggleAudioSystem() {
 
 function buildUniqueOrbitMap() {
     const wrap = document.getElementById("nodesContainer"); wrap.innerHTML = "";
-    for(let i=1; i<=50; i++) {
+    for(let i=1; i<=100; i++) {
         const d = document.createElement("div"); d.id = `node-${i}`; d.className = "level-node";
-        let angle = (i * 0.45);
-        let radius = 60 + (i * 5.2);
+        let angle = (i * 0.42);
+        let radius = 55 + (i * 4.8);
         let leftPos = 50 + Math.cos(angle) * (radius * 0.09);
-        let topPos = 40 + (i * 17);
+        let topPos = 40 + (i * 18);
         d.style.left = `${leftPos}%`; d.style.top = `${topPos}px`;
         d.onclick = () => launchLevel(i); wrap.appendChild(d);
     }
@@ -230,17 +246,17 @@ function buildUniqueOrbitMap() {
 
 function initPersistence() {
     buildUniqueOrbitMap();
-    const l = localStorage.getItem("z50_max"); const c = localStorage.getItem("z50_curr"); const d = localStorage.getItem("z50_deaths");
+    const l = localStorage.getItem("z100_max"); const c = localStorage.getItem("z100_curr"); const d = localStorage.getItem("z100_deaths");
     if(l) maxUnlockedLevel = parseInt(l); if(c) currentLevel = parseInt(c); if(d) deaths = parseInt(d);
     refreshUniverseMap();
 }
 
 function saveProgress() {
-    localStorage.setItem("z50_max", maxUnlockedLevel); localStorage.setItem("z50_curr", currentLevel); localStorage.setItem("z50_deaths", deaths);
+    localStorage.setItem("z100_max", maxUnlockedLevel); localStorage.setItem("z100_curr", currentLevel); localStorage.setItem("z100_deaths", deaths);
 }
 
 function refreshUniverseMap() {
-    for(let i=1; i<=50; i++) {
+    for(let i=1; i<=100; i++) {
         const n = document.getElementById(`node-${i}`); if(!n) continue;
         n.className = "level-node";
         if(i <= maxUnlockedLevel) { n.classList.add("unlocked"); n.innerText = i; if(i === currentLevel) n.classList.add("current"); }
@@ -248,68 +264,71 @@ function refreshUniverseMap() {
     }
 }
 
-// 100% UNINTERRUPTED DISTINCT LEVEL BLUEPRINTS (NO GLITCHES - GUARANTEED ACHIEVABLE GAPS)
+// 100 DISTINCT CHANNELS - SAFE MATHEMATICAL COMPACT BOUNDS FOR LANDING EVERYWHERE
 function loadLevelBlueprint(lvl) {
     platforms = []; traps = []; lasers = [];
-    let isFlyingZone = (lvl >= 16 && lvl <= 30);
+    let isFlyingZone = (lvl >= 25 && lvl <= 50);
 
-    // Dynamic Level Spawning Floor Anchor
+    let seed = lvl * 81.37;
+    let pseudo = (o) => Math.abs(Math.sin(seed + o));
+
+    // Dynamic starting anchor
+    let startPlatWidth = 120 + (pseudo(1) * 30);
+    let startPlatY = 400 + (pseudo(2) * 20);
     if (!isFlyingZone) { 
-        platforms.push({ x: 0, y: 410, width: 140, height: 70 }); 
+        platforms.push({ x: 0, y: startPlatY, width: startPlatWidth, height: 80 }); 
     } else { 
         platforms.push({ x: 0, y: 340, width: 90, height: 140 }); 
     }
 
-    let seed = lvl * 67.89;
-    let pseudo = (o) => Math.abs(Math.sin(seed + o));
+    // Portal Platform Generation (SAFE REACH BOUNDS GUARANTEED)
+    portal.x = 730 + (pseudo(3) * 30); 
+    portal.y = 160 + (pseudo(4) * 180);
 
-    portal.x = 730 + (pseudo(1) * 30); portal.y = 150 + (pseudo(2) * 200);
-    platforms.push({ x: portal.x - 15, y: portal.y + 80, width: 110, height: 260 });
-
-    if (lvl <= 15) {
-        // TIER 1: Balanced Hardcore Jump Maps
-        // LEVEL 1 FIXED POSITION JUMP (Guaranteed structural landing)
-        let firstGapWidth = (lvl === 1) ? 120 : 110 + (pseudo(3) * 45);
-        let nextPlatX = 140 + firstGapWidth;
-        let nextPlatY = 390 + (pseudo(4) * 30);
+    // Midsection path bridges
+    let currentX = startPlatWidth;
+    while(currentX < portal.x - 130) {
+        // STRICTLY CAP THE HORIZONTAL GAP WIDTH TO 125px MAX FOR ACCESSIBLE JUMPS
+        let gap = 90 + (pseudo(currentX + 5) * 35); 
+        let nextWidth = 90 + (pseudo(currentX + 12) * 50);
+        let nextY = 320 + (pseudo(currentX + 9) * 90);
         
-        platforms.push({ x: nextPlatX, y: nextPlatY, width: 110, height: 90 });
+        let platX = currentX + gap;
+        platforms.push({ 
+            x: platX, 
+            y: nextY, 
+            width: nextWidth, 
+            height: 200,
+            type: (lvl >= 51 && lvl <= 75) ? 'sine' : 'static',
+            baseVal: nextY,
+            drift: 35 + (pseudo(platX) * 25)
+        });
 
-        let thirdPlatX = nextPlatX + 110 + (90 + (pseudo(5) * 40));
-        platforms.push({ x: thirdPlatX, y: 360 + (pseudo(6) * 40), width: 100, height: 120 });
-
-        if(lvl === 8) { 
-            // Level 8 custom momentum landing path
-            platforms.push({ x: 320, y: 400, width: 85, height: 30 }); 
+        // Add secret hidden danger elements completely texture-matched to platforms
+        if(pseudo(currentX) > 0.5) {
+            traps.push({ x: platX + (nextWidth / 3), y: nextY - 24, width: 24, height: 24, type: 'static' });
+        } else if(pseudo(currentX) < 0.25) {
+            traps.push({ x: platX + 10, y: -60, currentY: -60, width: 32, height: 32, type: 'falling', triggerX: platX - 40, triggered: false });
         }
 
-        // Suspicious Hidden Traps (Rendered matching platform visual state)
-        traps.push({ x: nextPlatX + 35, y: nextPlatY - 24, width: 24, height: 24, type: 'static' });
-        traps.push({ x: thirdPlatX + 20, y: -50, currentY: -50, width: 35, height: 35, type: 'falling', triggerX: nextPlatX, triggered: false });
-    } 
-    else if (lvl <= 30) {
-        // TIER 2: Fixed Sky Floating Jetpack Mode
-        let fX = 240 + (pseudo(7) * 110); let fY = 190 + (pseudo(8) * 130);
-        platforms.push({ x: fX, y: fY, width: 85, height: 25 });
-        lasers.push({ x: fX - 50, y1: 10, y2: 380, speed: 75 + Math.floor(pseudo(9)*50), timer: 0 });
-    } 
-    else if (lvl <= 45) {
-        // TIER 3: Re-engineered Shift Loops (Glitch-Free Architecture)
-        let mX = 220 + (pseudo(10) * 100); let mY = 330;
-        platforms.push({ x: mX, y: mY, width: 140, height: 25, type: 'sine', baseVal: mY, drift: 55 });
-        traps.push({ x: mX + 50, y: 0, currentY: -40, width: 32, height: 32, type: 'falling', triggerX: mX - 20, triggered: false });
-    } 
-    else {
-        // TIER 4: Ultimate Core Chaos Architectures
-        platforms.push({ x: 170, y: 380, width: 85, height: 100 });
-        platforms.push({ x: 350, y: 280, width: 85, height: 200 });
-        platforms.push({ x: 530, y: 340, width: 85, height: 140 });
-        lasers.push({ x: 300, y1: 0, y2: 450, speed: 60, timer: 0 });
-        lasers.push({ x: 480, y1: 0, y2: 450, speed: 60, timer: 20 });
+        currentX = platX + nextWidth;
+    }
+
+    // Anchor Portal platform safely inside connection limits
+    platforms.push({ x: portal.x - 20, y: portal.y + 80, width: 120, height: 300 });
+
+    // Dynamic environment hazard modifiers
+    if (isFlyingZone) {
+        lasers.push({ x: 300 + (pseudo(15)*200), y1: 10, y2: 400, speed: 70 + Math.floor(pseudo(20)*50), timer: 0 });
+    }
+    if (lvl > 75) {
+        lasers.push({ x: 250, y1: 0, y2: 460, speed: 65, timer: 0 });
+        lasers.push({ x: 520, y1: 0, y2: 460, speed: 65, timer: 25 });
     }
 }
 
 function enterLevelSelector() {
+    if(systemHalted) return;
     gameState = "MENU";
     document.getElementById("welcomeScreen").classList.add("hide");
     document.getElementById("homeScreen").classList.remove("hide");
@@ -323,7 +342,7 @@ function launchLevel(selectedLvl) {
     document.getElementById("controlsOverlay").classList.remove("hide");
     document.getElementById("backToMenuBtn").classList.remove("hide");
     gameState = "PLAYING";
-    player.x = 40; player.y = 220; player.velX = 0; player.velY = 0;
+    player.x = 35; player.y = 200; player.velX = 0; player.velY = 0;
     loadLevelBlueprint(currentLevel);
     try { startSoftMelody(); } catch(e){}
 }
@@ -336,12 +355,11 @@ function exitToMenu() {
     refreshUniverseMap();
 }
 
-// SECURE TOUCH-KEYBOARD HOOK CONTROLLERS
 let activeKeys = { Left: false, Right: false, Jump: false };
 function bindControls() {
     const hook = (id, key) => {
         const el = document.getElementById(id);
-        el.addEventListener("touchstart", (e) => { e.preventDefault(); activeKeys[key] = true; });
+        el.addEventListener("touchstart", (e) => { e.preventDefault(); if(!systemHalted) activeKeys[key] = true; });
         el.addEventListener("touchend", (e) => { e.preventDefault(); activeKeys[key] = false; });
     };
     hook("btnLeft", "Left"); hook("btnRight", "Right"); hook("btnJump", "Jump");
@@ -366,30 +384,30 @@ function update() {
     if (gameState !== "PLAYING" || isTransitioning || systemHalted) return;
 
     globalTime++;
-    let isFlyingZone = (currentLevel >= 16 && currentLevel <= 30);
+    let isFlyingZone = (currentLevel >= 25 && currentLevel <= 50);
 
     if (isFlyingZone) {
-        if (activeKeys.Jump) { player.velY -= 0.60; if(player.velY < -4.8) player.velY = -4.8; }
-        else { player.velY += 0.30; }
+        if (activeKeys.Jump) { player.velY -= 0.58; if(player.velY < -4.8) player.velY = -4.8; }
+        else { player.velY += 0.28; }
     } else {
         if (activeKeys.Jump && !player.jumping && player.grounded) {
             player.jumping = true; player.grounded = false;
-            player.velY = (currentLevel === 8 || currentLevel === 1) ? -12.5 : -11.4;
+            player.velY = -12.4; 
         }
         player.velY += baseGravity;
     }
 
-    if (activeKeys.Left) { if(player.velX > -player.speed) player.velX -= 0.7; }
-    if (activeKeys.Right) { if(player.velX < player.speed) player.velX += 0.7; }
+    if (activeKeys.Left) { if(player.velX > -player.speed) player.velX -= 0.75; }
+    if (activeKeys.Right) { if(player.velX < player.speed) player.velX += 0.75; }
     
     player.velX *= friction; player.grounded = false;
 
-    // Platform Shift Loop Fix
+    // Fixed Position Shifts
     for(let plat of platforms) {
         if(plat.type === 'sine') plat.y = plat.baseVal + Math.sin(globalTime * 0.04) * plat.drift;
     }
 
-    // Double-Axis Robust Collision Prevention (Eliminates wall clipping & glitch physics)
+    // X Axis collision loops
     player.x += player.velX;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -398,6 +416,7 @@ function update() {
         }
     }
 
+    // Y Axis collision loops
     player.y += player.velY;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -414,7 +433,7 @@ function update() {
     if(player.x > canvas.width - player.width) player.x = canvas.width - player.width;
     if (player.y > canvas.height || player.y < -40) playerDie();
 
-    // Hidden Traps Core Mechanics
+    // Surprise Hidden Traps Physics
     for (let trap of traps) {
         if (player.x >= trap.triggerX) trap.triggered = true;
         if (trap.type === 'falling' && trap.triggered) trap.currentY += 8.0;
@@ -438,20 +457,20 @@ function update() {
 
 function triggerNextLevel() {
     isTransitioning = true;
-    document.getElementById("victoryText").innerText = `Phase 0${currentLevel} Clear`;
+    document.getElementById("victoryText").innerText = `Dimension ${currentLevel} Cleared`;
     document.getElementById("victoryOverlay").classList.remove("hide");
     setTimeout(() => {
         document.getElementById("victoryOverlay").classList.add("hide");
-        if (currentLevel === maxUnlockedLevel && maxUnlockedLevel < 50) maxUnlockedLevel++;
-        if (currentLevel < 50) currentLevel++;
-        saveProgress(); player.x = 40; player.y = 220; player.velX = 0; player.velY = 0;
+        if (currentLevel === maxUnlockedLevel && maxUnlockedLevel < 100) maxUnlockedLevel++;
+        if (currentLevel < 100) currentLevel++;
+        saveProgress(); player.x = 35; player.y = 200; player.velX = 0; player.velY = 0;
         loadLevelBlueprint(currentLevel); isTransitioning = false;
     }, 1200);
 }
 
 function playerDie() {
     deaths++; saveProgress();
-    player.x = 40; player.y = 220; player.velX = 0; player.velY = 0;
+    player.x = 35; player.y = 200; player.velX = 0; player.velY = 0;
     loadLevelBlueprint(currentLevel);
 }
 
@@ -459,18 +478,17 @@ function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = "#070b12"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    ctx.fillStyle = "rgba(56, 189, 248, 0.3)";
+    ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
     for(let s of stars) ctx.fillRect(s.x, s.y, s.size, s.size);
 
     if (gameState === "WELCOME" || gameState === "MENU" || systemHalted) return;
 
-    // Solid Level Platforms
     for (let plat of platforms) {
         ctx.fillStyle = "#111827"; ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
         ctx.fillStyle = "#4f46e5"; ctx.fillRect(plat.x, plat.y, plat.width, 3);
     }
 
-    // HIDDEN DECEPTIVE TRAPS (Perfectly matches standard platform architecture colors)
+    // TRAPS MATCHING ARCHITECTURE EXACT COLORS (SUSPENSE RETAINED)
     for (let trap of traps) {
         let ty = trap.type === 'falling' ? trap.currentY : trap.y;
         ctx.fillStyle = "#111827"; ctx.fillRect(trap.x, ty, trap.width, trap.height);
@@ -489,14 +507,14 @@ function render() {
     ctx.strokeStyle = "#22d3ee"; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.arc(0, 0, 24, 0, Math.PI*2); ctx.stroke(); ctx.restore();
 
-    // CHARACTER ENGINE ASSET
+    // PLAYER ENGINE
     ctx.fillStyle = "#22d3ee";
     ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 6); ctx.fill();
     ctx.fillStyle = "#070b12"; ctx.fillRect(player.x + 4, player.y + 6, player.width - 8, 8);
 
     ctx.fillStyle = "#64748b"; ctx.font = "bold 12px monospace";
-    ctx.fillText(`PHASE: ${currentLevel} / 50`, 40, 36);
-    ctx.fillText(`DEATHS: ${deaths}`, 220, 36);
+    ctx.fillText(`DIMENSION: ${currentLevel} / 100`, 40, 36);
+    ctx.fillText(`DEATHS: ${deaths}`, 230, 36);
 }
 
 function mainGameLoop() { update(); render(); requestAnimationFrame(mainGameLoop); }
