@@ -18,7 +18,6 @@
             align-items: center;
         }
         
-        /* Master Responsive App Container - Never cuts off on any mobile */
         #gameContainer {
             position: relative;
             width: 100%;
@@ -35,17 +34,17 @@
         
         canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         
-        /* Studio Branding */
-        .studio-intro {
+        /* Company Intro - Displayed ONLY on Welcome and Map Screens via ID control */
+        #brandingIntro {
             position: absolute;
             top: 4%; right: 4%;
             text-align: right; z-index: 30;
             font-family: monospace; pointer-events: none;
         }
-        .studio-intro .brand { font-size: calc(10px + 0.4vw); font-weight: bold; letter-spacing: 2px; color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); }
-        .studio-intro .sub { font-size: calc(7px + 0.2vw); letter-spacing: 1px; color: #64748b; margin-top: 1px; }
+        #brandingIntro .brand { font-size: calc(10px + 0.4vw); font-weight: bold; letter-spacing: 2px; color: #38bdf8; text-shadow: 0 0 8px rgba(56, 189, 248, 0.6); }
+        #brandingIntro .sub { font-size: calc(7px + 0.2vw); letter-spacing: 1px; color: #64748b; margin-top: 1px; }
 
-        /* Sound Control */
+        /* Mute Button Toggle UI element */
         #audioToggleBtn {
             position: absolute;
             top: 15%; right: 4%;
@@ -58,7 +57,7 @@
         }
         #audioToggleBtn svg { width: 16px; height: 16px; fill: #38bdf8; }
 
-        /* STRICT LANDSCAPE ENFORCEMENT OVERLAY - Completely blocks interaction */
+        /* LANDSCAPE MODE CONTROLLER OVERLAY */
         #orientationOverlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #05070f; z-index: 99999;
@@ -83,7 +82,6 @@
             100% { transform: rotate(-90deg); }
         }
 
-        /* Screen Flow Layouts */
         .screen {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -122,17 +120,20 @@
         .orbit-2 { width: 60%; height: 70%; }
         .orbit-3 { width: 85%; height: 90%; }
         
+        /* High-Visibility Level Selector Nodes */
         .level-node {
-            position: absolute; width: 36px; height: 36px;
-            background: #0f172a; border: 2px solid #475569;
+            position: absolute; width: 38px; height: 38px;
+            background: #111827; border: 2px solid #3b4252;
             border-radius: 50%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; font-size: 12px; font-weight: bold; color: #64748b;
+            cursor: pointer; font-size: 13px; font-weight: bold; color: #94a3b8;
             z-index: 15; transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
         }
-        .level-node.unlocked { border-color: #38bdf8; color: #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.2); }
-        .level-node.current { border-color: #a855f7; color: #a855f7; animation: pulseGlow 1.5s infinite ease-in-out; }
-        .level-node.locked { cursor: not-allowed; opacity: 0.35; }
-        .level-node.locked svg { width: 12px; height: 12px; fill: #475569; }
+        .level-node.unlocked { border-color: #38bdf8; color: #38bdf8; background: #0f172a; box-shadow: 0 0 12px rgba(56, 189, 248, 0.3); }
+        .level-node.current { border-color: #a855f7; color: #a855f7; background: #1e1b4b; animation: pulseGlow 1.5s infinite ease-in-out; }
+        .level-node.locked { cursor: not-allowed; opacity: 0.5; background: #0b0f19; border-color: #475569; color: #475569; }
+        .level-node svg { width: 12px; height: 12px; fill: #475569; }
+        .level-node.unlocked svg { fill: #38bdf8; }
 
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 8px rgba(168, 85, 247, 0.4); }
@@ -155,7 +156,6 @@
         }
         #victoryPopup h2 { font-size: 28px; font-weight: 900; color: #eab308; text-transform: uppercase; }
 
-        /* Safe Mobile Safe-Area Controls Layout */
         #controlsOverlay {
             position: absolute; bottom: 6%; left: 0; width: 100%;
             display: flex; justify-content: space-between; padding: 0 6%;
@@ -179,9 +179,9 @@
     </div>
 
     <div id="gameContainer">
-        <div class="studio-intro">
+        <div id="brandingIntro">
             <div class="brand">STARDUST QUANTUM LABS</div>
-            <div class="sub">SIMULATION MODULE v4.0-APP</div>
+            <div class="sub">SIMULATION MODULE v4.2-STABLE</div>
         </div>
 
         <div id="audioToggleBtn" onclick="toggleAudioSystem()">
@@ -206,15 +206,15 @@
                 <div class="orbit-line orbit-3"></div>
                 
                 <div class="level-node" id="node-1" style="top:50%; left:50%;" onclick="launchLevel(1)">1</div>
-                <div class="level-node" id="node-2" style="top:50%; left:35%;" onclick="launchLevel(2)">2</div>
-                <div class="level-node" id="node-3" style="top:32%; left:46%;" onclick="launchLevel(3)">3</div>
-                <div class="level-node" id="node-4" style="top:42%; left:65%;" onclick="launchLevel(4)">4</div>
-                <div class="level-node" id="node-5" style="top:70%; left:56%;" onclick="launchLevel(5)">5</div>
-                <div class="level-node" id="node-6" style="top:22%; left:22%;" onclick="launchLevel(6)">6</div>
-                <div class="level-node" id="node-7" style="top:18%; left:72%;" onclick="launchLevel(7)">7</div>
-                <div class="level-node" id="node-8" style="top:82%; left:32%;" onclick="launchLevel(8)">8</div>
-                <div class="level-node" id="node-9" style="top:78%; left:80%;" onclick="launchLevel(9)">9</div>
-                <div class="level-node" id="node-10" style="top:50%; left:90%;" onclick="launchLevel(10)">10</div>
+                <div class="level-node" id="node-2" style="top:50%; left:33%;" onclick="launchLevel(2)">2</div>
+                <div class="level-node" id="node-3" style="top:28%; left:45%;" onclick="launchLevel(3)">3</div>
+                <div class="level-node" id="node-4" style="top:42%; left:67%;" onclick="launchLevel(4)">4</div>
+                <div class="level-node" id="node-5" style="top:72%; left:56%;" onclick="launchLevel(5)">5</div>
+                <div class="level-node" id="node-6" style="top:22%; left:20%;" onclick="launchLevel(6)">6</div>
+                <div class="level-node" id="node-7" style="top:16%; left:74%;" onclick="launchLevel(7)">7</div>
+                <div class="level-node" id="node-8" style="top:84%; left:30%;" onclick="launchLevel(8)">8</div>
+                <div class="level-node" id="node-9" style="top:80%; left:82%;" onclick="launchLevel(9)">9</div>
+                <div class="level-node" id="node-10" style="top:50%; left:92%;" onclick="launchLevel(10)">10</div>
             </div>
         </div>
 
@@ -315,7 +315,6 @@ function toggleAudioSystem() {
     }
 }
 
-// SECURE LOCK ROTATION DETECTOR SYSTEM
 function checkOrientation() {
     if (window.innerHeight > window.innerWidth) {
         document.getElementById("orientationOverlay").style.display = "flex";
@@ -359,8 +358,10 @@ function refreshUniverseMap() {
         const node = document.getElementById(`node-${i}`);
         if (!node) continue;
         node.className = "level-node";
+        
         if (i <= maxUnlockedLevel) {
             node.classList.add("unlocked");
+            node.innerText = i; // Show standard legible numerals
             if (i === currentLevel) node.classList.add("current");
         } else {
             node.classList.add("locked");
@@ -388,11 +389,12 @@ function loadLevel(lvl) {
             traps.push({ x: 460, y: -45, currentY: -45, width: 45, height: 45, triggerX: 430, type: 'falling', triggered: false });
             break;
         case 3: 
+            // FIXED TRAP: Level 3 Troll parameters re-balanced for clean mechanics
             portal.x = 60; portal.y = 130;
             platforms.push({ x: 160, y: 360, width: 700, height: 30 });
             platforms.push({ x: 380, y: 260, width: 220, height: 30 });
             platforms.push({ x: 0, y: 220, width: 140, height: 30 });  
-            traps.push({ x: 280, y: 360, currentY: 360, width: 35, height: 35, targetY: 325, type: 'rising', triggerX: 220, triggered: false });
+            traps.push({ x: 290, y: 360, currentY: 360, width: 35, height: 35, targetY: 328, type: 'rising', triggerX: 235, triggered: false });
             break;
         case 4:
             portal.x = 740; portal.y = 340;
@@ -445,6 +447,7 @@ function enterLevelSelector() {
     gameState = "MENU";
     document.getElementById("welcomeScreen").classList.add("hide");
     document.getElementById("homeScreen").classList.remove("hide");
+    document.getElementById("brandingIntro").classList.remove("hide"); // Show on map
     try { startSoftMelody(); } catch(e){}
     refreshUniverseMap();
 }
@@ -454,6 +457,7 @@ function launchLevel(selectedLvl) {
     currentLevel = selectedLvl;
     saveProgress();
     document.getElementById("homeScreen").classList.add("hide");
+    document.getElementById("brandingIntro").classList.add("hide"); // HIDDEN FROM GAMEPLAY SCREEN
     document.getElementById("controlsOverlay").classList.remove("hide");
     document.getElementById("backToMenuBtn").classList.remove("hide");
     gameState = "PLAYING";
@@ -464,6 +468,7 @@ function launchLevel(selectedLvl) {
 function exitToMenu() {
     gameState = "MENU";
     document.getElementById("homeScreen").classList.remove("hide");
+    document.getElementById("brandingIntro").classList.remove("hide"); // Show again on map
     document.getElementById("controlsOverlay").classList.add("hide");
     document.getElementById("backToMenuBtn").classList.add("hide");
     refreshUniverseMap();
@@ -529,7 +534,7 @@ function update() {
 
     for (let trap of traps) {
         if (player.x >= trap.triggerX) trap.triggered = true;
-        if (trap.type === 'rising' && trap.triggered && trap.currentY > trap.targetY) trap.currentY -= 3.5;
+        if (trap.type === 'rising' && trap.triggered && trap.currentY > trap.targetY) trap.currentY -= 3.0;
         if (trap.type === 'falling' && trap.triggered) trap.currentY += 8.2;
         let trapBox = { x: trap.x, y: trap.currentY, width: trap.width, height: trap.height };
         if (checkCollision(player, trapBox)) playerDie();
@@ -595,8 +600,8 @@ function render() {
     ctx.fillStyle = "#0b0f17"; ctx.fillRect(player.x + 4, player.y + 6, player.width - 8, 8);
 
     ctx.fillStyle = "#64748b"; ctx.font = "bold 13px monospace";
-    ctx.fillText(`PHASE LOG: 0${currentLevel} / 10`, 160, 36);
-    ctx.fillText(`DEATH COUNTER: ${deaths}`, 540, 36);
+    ctx.fillText(`PHASE LOG: 0${currentLevel} / 10`, 40, 36);
+    ctx.fillText(`DEATH COUNTER: ${deaths}`, 240, 36);
 }
 
 function gameLoop() {
