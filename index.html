@@ -26,9 +26,9 @@
             overflow: hidden;
             background: #070b12;
         }
-        canvas { display: block; }
+        canvas { display: block; position: absolute; top: 0; left: 0; z-index: 1; }
         
-        /* Premium Top-Right Company Intro */
+        /* Premium Top-Right Company Intro Branding */
         .studio-intro {
             position: absolute;
             top: 20px; right: 25px;
@@ -43,15 +43,28 @@
             top: 0; left: 0; width: 100%; height: 100%;
             display: flex; flex-direction: column;
             z-index: 10; background: #070b12;
-            transition: opacity 0.4s ease;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
         }
         .hide { display: none !important; opacity: 0; }
         
-        /* Menu Content Styles */
-        #homeScreen { padding: 40px; justify-content: flex-start; align-items: flex-start; }
-        .menu-title { font-size: 32px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(135deg, #22d3ee, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 25px; }
+        /* Main Welcome Intro Screen */
+        #welcomeScreen { justify-content: center; align-items: center; }
+        .welcome-company { font-size: 13px; letter-spacing: 6px; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; font-family: monospace; }
+        .welcome-title { font-size: 44px; font-weight: 900; letter-spacing: 4px; background: linear-gradient(135deg, #22d3ee, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 35px; }
         
-        /* Unique Cosmic Level Selector Map */
+        .btn-launch {
+            padding: 16px 45px; font-size: 16px; font-weight: bold; letter-spacing: 2px;
+            color: #fff; background: linear-gradient(135deg, #0284c7, #6d28d9);
+            border: none; border-radius: 30px; cursor: pointer;
+            box-shadow: 0 6px 20px rgba(109, 40, 217, 0.45);
+            text-transform: uppercase; transition: all 0.2s ease;
+        }
+        .btn-launch:active { transform: scale(0.95); box-shadow: 0 3px 10px rgba(109, 40, 217, 0.4); }
+
+        /* Custom Space Level Selector Map Screen */
+        #homeScreen { padding: 40px; justify-content: flex-start; align-items: flex-start; }
+        .menu-title { font-size: 28px; font-weight: 900; letter-spacing: 3px; background: linear-gradient(135deg, #22d3ee, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; margin-bottom: 25px; }
+        
         .map-container {
             width: 100%; height: 280px;
             background: rgba(15, 23, 42, 0.4);
@@ -59,7 +72,7 @@
             border-radius: 12px; position: relative; overflow: hidden;
         }
         .orbit-line {
-            position: absolute; border: 1px dashed rgba(56, 189, 248, 0.15);
+            position: absolute; border: 1px dashed rgba(56, 189, 248, 0.12);
             border-radius: 50%; top: 50%; left: 50%; transform: translate(-50%, -50%);
             pointer-events: none;
         }
@@ -75,37 +88,28 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 15;
             transform: translate(-50%, -50%);
         }
-        .level-node.unlocked {
-            border-color: #38bdf8; color: #38bdf8;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
-        }
-        .level-node.unlocked:hover {
-            background: #38bdf8; color: #070b12; scale: 1.15;
-            box-shadow: 0 0 25px #38bdf8;
-        }
-        .level-node.current {
-            border-color: #a855f7; color: #a855f7;
-            animation: pulseGlow 1.5s infinite ease-in-out;
-        }
-        .level-node.locked { cursor: not-allowed; opacity: 0.4; }
+        .level-node.unlocked { border-color: #38bdf8; color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.25); }
+        .level-node.unlocked:hover { background: #38bdf8; color: #070b12; scale: 1.15; box-shadow: 0 0 25px #38bdf8; }
+        .level-node.current { border-color: #a855f7; color: #a855f7; animation: pulseGlow 1.5s infinite ease-in-out; }
+        .level-node.locked { cursor: not-allowed; opacity: 0.35; }
         .level-node.locked svg { width: 14px; height: 14px; fill: #475569; }
 
         @keyframes pulseGlow {
             0% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
-            50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.8); scale: 1.05; }
+            50% { box-shadow: 0 0 25px rgba(168, 85, 247, 0.7); scale: 1.05; }
             100% { box-shadow: 0 0 10px rgba(168, 85, 247, 0.4); }
         }
 
         #backToMenuBtn {
             position: absolute; top: 20px; left: 25px;
-            padding: 8px 16px; background: rgba(15, 23, 42, 0.7);
+            padding: 8px 16px; background: rgba(15, 23, 42, 0.75);
             border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 20px;
             color: #38bdf8; font-size: 11px; font-weight: bold; cursor: pointer; z-index: 30;
             letter-spacing: 1px; text-transform: uppercase; backdrop-filter: blur(5px);
         }
 
-        /* Overlays & Popups */
-        #victoryOverlay { background: rgba(5, 7, 15, 0.75); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
+        /* Success Layer overlay */
+        #victoryOverlay { background: rgba(5, 7, 15, 0.8); backdrop-filter: blur(4px); justify-content: center; align-items: center; }
         #victoryPopup {
             background: rgba(15, 23, 42, 0.95); border: 2px solid #eab308;
             box-shadow: 0 0 40px rgba(234, 179, 8, 0.3); border-radius: 16px;
@@ -113,9 +117,8 @@
             animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #victoryPopup h2 { font-size: 36px; font-weight: 900; color: #eab308; letter-spacing: 3px; margin-bottom: 8px; text-transform: uppercase; }
-        @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* Controls Layout */
+        /* Dynamic On-Screen Controls Pad mapping */
         #controlsOverlay {
             position: absolute; bottom: 25px; left: 0; width: 100%;
             display: flex; justify-content: space-between; padding: 0 50px;
@@ -137,12 +140,18 @@
     <div id="gameContainer">
         <div class="studio-intro">
             <div class="brand">STARDUST QUANTUM LABS</div>
-            <div class="sub">SIMULATION FRAMEWORK V3.0</div>
+            <div class="sub">SIMULATION MODULE v3.5</div>
         </div>
 
         <button id="backToMenuBtn" class="hide" onclick="exitToMenu()">Abort Mission</button>
 
-        <div id="homeScreen" class="screen">
+        <div id="welcomeScreen" class="screen">
+            <div class="welcome-company">Stardust Studio Presents</div>
+            <h1 class="welcome-title">Cosmic Deception</h1>
+            <button class="btn-launch" onclick="enterLevelSelector()">Start Simulation</button>
+        </div>
+
+        <div id="homeScreen" class="screen hide">
             <h1 class="menu-title">Select Simulation Phase</h1>
             <div class="map-container">
                 <div class="orbit-line orbit-1"></div>
@@ -151,7 +160,7 @@
                 
                 <div class="level-node" id="node-1" style="top:50%; left:50%;" onclick="launchLevel(1)">1</div>
                 <div class="level-node" id="node-2" style="top:50%; left:37%;" onclick="launchLevel(2)">2</div>
-                <div class="level-node" id="node-3" style="top:32%; left:44%;" onclick="launchLevel(3)">3</div>
+                <div class="level-node" id="node-3" style="top:35%; left:46%;" onclick="launchLevel(3)">3</div>
                 <div class="level-node" id="node-4" style="top:42%; left:63%;" onclick="launchLevel(4)">4</div>
                 <div class="level-node" id="node-5" style="top:68%; left:56%;" onclick="launchLevel(5)">5</div>
                 <div class="level-node" id="node-6" style="top:25%; left:25%;" onclick="launchLevel(6)">6</div>
@@ -165,7 +174,7 @@
         <div id="victoryOverlay" class="screen hide">
             <div id="victoryPopup">
                 <h2 id="victoryText">Phase Clear</h2>
-                <p style="color: #94a3b8; font-size: 13px; letter-spacing: 2px; font-weight: 600;">SYNCHRONIZING TIMELINE OVERRIDE...</p>
+                <p style="color: #94a3b8; font-size: 13px; letter-spacing: 2px; font-weight: 600;">SYNCHRONIZING TIMELINE...</p>
             </div>
         </div>
 
@@ -192,14 +201,14 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let gameState = "MENU";
+let gameState = "WELCOME";
 let currentLevel = 1;
 let maxUnlockedLevel = 1;
 let deaths = 0;
 let isTransitioning = false;
 let portalRotation = 0;
 
-// Rigid Vector Structure Setup
+// High-Precision Physics Vector Model
 let player = { x: 40, y: 350, width: 22, height: 32, speed: 4.8, velX: 0, velY: 0, jumping: false, grounded: false };
 const gravity = 0.52;
 const friction = 0.82;
@@ -210,9 +219,67 @@ for(let i=0; i<45; i++) stars.push({ x: Math.random()*854, y: Math.random()*480,
 
 let platforms = [];
 let traps = [];
-let portal = { x: 770, y: 340, width: 50, height: 90 };
+let portal = { x: 730, y: 330, width: 50, height: 90 }; // Tuned vector position
 
-// STATE PERSISTENCE LOGIC (Anti-Refresh Save System)
+// AUDIO SYNTH ARPEGIATOR WITH AUTO-PAUSE FOR SAFETY
+let audioCtx = null;
+let masterGain = null;
+let audioLoopId = null;
+
+function startSoftMelody() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0.2, audioCtx.currentTime); // Soft comfortable volume
+    masterGain.connect(audioCtx.destination);
+
+    let melody = [293.66, 329.63, 349.23, 392.00, 440.00, 523.25]; 
+    let index = 0;
+
+    audioLoopId = setInterval(() => {
+        if (!audioCtx || audioCtx.state !== "running" || isTransitioning) return;
+        
+        let osc = audioCtx.createOscillator();
+        let gainNode = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(melody[index], audioCtx.currentTime);
+
+        gainNode.gain.setValueAtTime(0, audioCtx.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.15, audioCtx.currentTime + 0.05);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4);
+
+        osc.connect(gainNode);
+        gainNode.connect(masterGain);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.45);
+
+        index = (index + 1) % melody.length;
+    }, 280);
+}
+
+// SMART AUTOMATED TAB-SWITCH FOCUS AND UNFOCUS SOUND CONTROL
+document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+        if (audioCtx && audioCtx.state === "running") {
+            audioCtx.suspend();
+        }
+    } else {
+        if (audioCtx && audioCtx.state === "suspended") {
+            audioCtx.resume();
+        }
+    }
+});
+
+// Also suspend sound if user hits browser back or unloads window completely
+window.addEventListener("beforeunload", () => {
+    if(audioCtx) {
+        clearInterval(audioLoopId);
+        audioCtx.close();
+    }
+});
+
+// LOCAL STORAGE REFRESH RESILIENCE ENGINE
 function initPersistence() {
     const savedLevel = localStorage.getItem("stardust_max_lvl");
     const savedCurrent = localStorage.getItem("stardust_curr_lvl");
@@ -235,7 +302,7 @@ function refreshUniverseMap() {
     for(let i=1; i<=10; i++) {
         const node = document.getElementById(`node-${i}`);
         if (!node) continue;
-        node.className = "level-node"; // reset
+        node.className = "level-node";
         
         if (i <= maxUnlockedLevel) {
             node.classList.add("unlocked");
@@ -247,55 +314,50 @@ function refreshUniverseMap() {
     }
 }
 
-// LEVEL SYSTEM DATA
+// 100% CROSSABLE GEOMETRY MAPPING Engine
 function loadLevel(lvl) {
     platforms = []; traps = [];
-    platforms.push({ x: 0, y: 430, width: 140, height: 50 }); // Spawn Safe Block
+    platforms.push({ x: 0, y: 430, width: 140, height: 50 }); // Safe Spawn Stand
 
     switch(lvl) {
         case 1:
-            portal.x = 760; portal.y = 340;
+            portal.x = 730; portal.y = 340;
             platforms.push({ x: 140, y: 430, width: 540, height: 50 });
             platforms.push({ x: 680, y: 430, width: 180, height: 50 });
             traps.push({ x: 320, y: 430, currentY: 430, width: 35, height: 40, targetY: 395, type: 'rising', triggerX: 260, triggered: false });
-            traps.push({ x: 540, y: 430, currentY: 430, width: 35, height: 40, targetY: 395, type: 'rising', triggerX: 490, triggered: false });
             break;
         case 2:
-            portal.x = 760; portal.y = 130;
+            portal.x = 730; portal.y = 140;
             platforms.push({ x: 200, y: 350, width: 160, height: 30 });
-            platforms.push({ x: 420, y: 260, width: 160, height: 30 });
-            platforms.push({ x: 650, y: 220, width: 210, height: 30 });
+            platforms.push({ x: 420, y: 265, width: 160, height: 30 });
+            platforms.push({ x: 650, y: 230, width: 210, height: 30 });
             traps.push({ x: 460, y: -45, currentY: -45, width: 45, height: 45, triggerX: 430, type: 'falling', triggered: false });
             break;
-        case 3: 
-            portal.x = 50; portal.y = 130;
-            platforms.push({ x: 180, y: 360, width: 680, height: 30 });
-            platforms.push({ x: 420, y: 260, width: 200, height: 30 }); 
-            platforms.push({ x: 0, y: 220, width: 160, height: 30 });   
-            traps.push({ x: 300, y: 360, currentY: 360, width: 35, height: 35, targetY: 325, type: 'rising', triggerX: 250, triggered: false });
-            traps.push({ x: 520, y: 260, currentY: 260, width: 35, height: 35, targetY: 225, type: 'rising', triggerX: 470, triggered: false });
+        case 3: // PERFECTLY BALANCED ARC DISTANCE GAP: Crossable under simple physics jump range
+            portal.x = 60; portal.y = 130;
+            platforms.push({ x: 160, y: 360, width: 700, height: 30 });
+            platforms.push({ x: 380, y: 260, width: 220, height: 30 }); // Easily Reachable Middle Jump Node
+            platforms.push({ x: 0, y: 220, width: 140, height: 30 });   // Connected to Exit gate
+            traps.push({ x: 280, y: 360, currentY: 360, width: 35, height: 35, targetY: 325, type: 'rising', triggerX: 220, triggered: false });
             break;
         case 4:
-            portal.x = 780; portal.y = 340;
-            platforms.push({ x: 200, y: 430, width: 500, height: 50 });
-            platforms.push({ x: 240, y: 320, width: 440, height: 30 }); 
+            portal.x = 740; portal.y = 340;
+            platforms.push({ x: 180, y: 430, width: 520, height: 50 });
+            platforms.push({ x: 240, y: 320, width: 420, height: 30 }); 
             platforms.push({ x: 700, y: 430, width: 160, height: 50 });
-            traps.push({ x: 380, y: 430, currentY: 430, width: 35, height: 35, targetY: 395, type: 'rising', triggerX: 310, triggered: false });
             traps.push({ x: 550, y: -80, currentY: -80, width: 40, height: 120, type: 'falling', triggerX: 480, triggered: false });
             break;
         case 5:
-            portal.x = 760; portal.y = 110;
+            portal.x = 740; portal.y = 110;
             platforms.push({ x: 180, y: 350, width: 110, height: 130 });
             platforms.push({ x: 440, y: 250, width: 110, height: 230 });
             platforms.push({ x: 640, y: 200, width: 220, height: 280 });
-            traps.push({ x: 475, y: 250, currentY: 250, width: 35, height: 35, targetY: 215, type: 'rising', triggerX: 445, triggered: false });
             break;
         case 6:
-            portal.x = 770; portal.y = 340;
+            portal.x = 740; portal.y = 340;
             platforms.push({ x: 180, y: 320, width: 260, height: 30 }); 
             platforms.push({ x: 180, y: 430, width: 500, height: 50 }); 
             platforms.push({ x: 680, y: 430, width: 180, height: 50 });
-            traps.push({ x: 320, y: 430, currentY: 430, width: 35, height: 35, targetY: 395, type: 'rising', triggerX: 280, triggered: false });
             traps.push({ x: 300, y: -60, currentY: -60, width: 50, height: 50, triggerX: 220, type: 'falling', triggered: false });
             break;
         case 7:
@@ -304,39 +366,41 @@ function loadLevel(lvl) {
             platforms.push({ x: 520, y: 300, width: 240, height: 30 });
             platforms.push({ x: 230, y: 200, width: 220, height: 30 });
             platforms.push({ x: 0, y: 200, width: 150, height: 30 });
-            traps.push({ x: 590, y: 320, currentY: 320, width: 35, height: 35, targetY: 285, type: 'rising', triggerX: 540, triggered: false });
-            traps.push({ x: 300, y: -60, currentY: -60, width: 45, height: 45, triggerX: 260, type: 'falling', triggered: false });
             break;
         case 8:
-            portal.x = 760; portal.y = 340;
+            portal.x = 740; portal.y = 340;
             platforms.push({ x: 0, y: 430, width: 260, height: 50 });
             platforms.push({ x: 540, y: 430, width: 320, height: 50 });
             traps.push({ x: 610, y: 430, currentY: 430, width: 40, height: 40, targetY: 390, type: 'rising', triggerX: 570, triggered: false });
             break;
         case 9:
-            portal.x = 770; portal.y = 110;
+            portal.x = 740; portal.y = 110;
             platforms.push({ x: 180, y: 380, width: 60, height: 100 });
             platforms.push({ x: 300, y: 320, width: 60, height: 160 });
             platforms.push({ x: 420, y: 260, width: 60, height: 220 });
             platforms.push({ x: 540, y: 210, width: 60, height: 270 });
             platforms.push({ x: 660, y: 200, width: 200, height: 280 });
-            traps.push({ x: 312, y: 320, currentY: 320, width: 35, height: 35, targetY: 285, type: 'rising', triggerX: 300, triggered: false });
-            traps.push({ x: 552, y: 210, currentY: 210, width: 35, height: 35, targetY: 175, type: 'rising', triggerX: 540, triggered: false });
             break;
         case 10:
-            portal.x = 780; portal.y = 340;
+            portal.x = 740; portal.y = 340;
             platforms.push({ x: 150, y: 430, width: 200, height: 50 });
             platforms.push({ x: 350, y: 430, width: 220, height: 50 });
             platforms.push({ x: 570, y: 430, width: 300, height: 50 });
-            traps.push({ x: 220, y: 430, currentY: 430, width: 35, height: 40, targetY: 390, type: 'rising', triggerX: 190, triggered: false });
             traps.push({ x: 440, y: -60, currentY: -60, width: 55, height: 55, triggerX: 390, type: 'falling', triggered: false });
-            traps.push({ x: 690, y: 430, currentY: 430, width: 35, height: 40, targetY: 390, type: 'rising', triggerX: 660, triggered: false });
             break;
     }
 }
 
+function enterLevelSelector() {
+    gameState = "MENU";
+    document.getElementById("welcomeScreen").classList.add("hide");
+    document.getElementById("homeScreen").classList.remove("hide");
+    try { startSoftMelody(); } catch(e){}
+    refreshUniverseMap();
+}
+
 function launchLevel(selectedLvl) {
-    if (selectedLvl > maxUnlockedLevel) return; // Block Locked Phase
+    if (selectedLvl > maxUnlockedLevel) return;
     currentLevel = selectedLvl;
     saveProgress();
     
@@ -366,7 +430,6 @@ function bindControls() {
     };
     hook("btnLeft", "Left"); hook("btnRight", "Right"); hook("btnJump", "Jump");
     
-    // Keyboard fallbacks for debugging
     window.addEventListener("keydown", (e) => {
         if(e.key === "ArrowLeft" || e.key === "a") activeKeys.Left = true;
         if(e.key === "ArrowRight" || e.key === "d") activeKeys.Right = true;
@@ -404,7 +467,6 @@ function update() {
     player.velX *= friction; player.velY += gravity;
     player.grounded = false;
 
-    // Advanced Separation Wall Solver
     player.x += player.velX;
     for (let plat of platforms) {
         if (checkCollision(player, plat)) {
@@ -481,10 +543,9 @@ function playerDie() {
 
 function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
     ctx.fillStyle = "#070b12"; ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // Background Stars Matrix
+    // Twinkling Space Matrix Background
     ctx.fillStyle = "#fff";
     for(let s of stars) {
         ctx.globalAlpha = Math.abs(Math.sin(Date.now()*0.001 + s.alpha*10));
@@ -499,21 +560,20 @@ function render() {
     }
     ctx.globalAlpha = 1.0;
 
-    if (gameState === "MENU") return; // Menu uses purely HTML overlay layers
+    if (gameState === "WELCOME" || gameState === "MENU") return;
 
-    // Render Environment Blocks
+    // Solid Level Geometry Blocks
     for (let plat of platforms) {
         ctx.fillStyle = "#111827"; ctx.fillRect(plat.x, plat.y, plat.width, plat.height);
         ctx.fillStyle = "#4f46e5"; ctx.fillRect(plat.x, plat.y, plat.width, 3);
     }
 
-    // Camouflaged Traps System
     for (let trap of traps) {
         ctx.fillStyle = "#111827"; ctx.fillRect(trap.x, trap.currentY, trap.width, trap.height);
         ctx.fillStyle = "#4f46e5"; ctx.fillRect(trap.x, trap.currentY, trap.width, 3);
     }
 
-    // Quantum Ring Exit Gate
+    // Interactive Escape Portal Rings
     let pCenterX = portal.x + portal.width / 2;
     let pCenterY = portal.y + portal.height / 2;
     ctx.save(); ctx.translate(pCenterX, pCenterY); ctx.rotate(portalRotation);
@@ -523,14 +583,14 @@ function render() {
     ctx.beginPath(); ctx.arc(0, 0, 22, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]);
     ctx.restore();
 
-    // Player Hero Unit
+    // Cosmic Player Character Box
     ctx.fillStyle = "#22d3ee"; 
     ctx.beginPath(); ctx.roundRect(player.x, player.y, player.width, player.height, 8); ctx.fill();
     ctx.fillStyle = "#0b0f17"; ctx.fillRect(player.x + 4, player.y + 6, player.width - 8, 8);
 
-    // Dashboard HUD Config
+    // Dynamic Upper Dashboard Heads-up Panel
     ctx.fillStyle = "#64748b"; ctx.font = "bold 13px monospace";
-    ctx.fillText(`PHASE OVERRIDE: 0${currentLevel} / 10`, 160, 36);
+    ctx.fillText(`PHASE LOG: 0${currentLevel} / 10`, 160, 36);
     ctx.fillText(`DEATH COUNTER: ${deaths}`, 540, 36);
 }
 
@@ -540,7 +600,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// System Boot
+// Ignition
 initPersistence();
 bindControls();
 gameLoop();
